@@ -278,10 +278,14 @@ export async function loadDatabase(): Promise<any> {
   console.log('No local db.json found. Creating default local database...');
   const defaults = getDefaults();
   const dir = path.dirname(DB_PATH);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  try {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(DB_PATH, JSON.stringify(defaults, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Failed to write default db.json on read-only filesystem:', err);
   }
-  fs.writeFileSync(DB_PATH, JSON.stringify(defaults, null, 2), 'utf-8');
   memoryCache = defaults;
   return memoryCache;
 }
