@@ -154,4 +154,9 @@ async function startServer() {
   });
 }
 
-startServer();
+// Only start persistent Express server if NOT running on Vercel as a Serverless Function
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+export default app;
