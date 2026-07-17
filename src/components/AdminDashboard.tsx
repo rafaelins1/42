@@ -126,9 +126,21 @@ export default function AdminDashboard({
 
   const fetchSyncStatus = () => {
     fetch('/api/db/sync-status')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
       .then(data => setSyncStatus(data))
-      .catch(err => console.error('Failed to get cloud sync status:', err));
+      .catch(err => {
+        console.error('Failed to get cloud sync status:', err);
+        setSyncStatus({
+          enabled: false,
+          lastSynced: null,
+          cloudUrl: 'Armazenamento',
+          bucketId: 'Erro',
+          connectionError: `Não foi possível obter o status de sincronização: ${err.message || err}`
+        });
+      });
   };
 
   React.useEffect(() => {

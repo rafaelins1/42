@@ -90,6 +90,7 @@ app.post('/api/db/orders/add', async (req, res) => {
 
 // Sync Status API endpoints
 app.get('/api/db/sync-status', async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
   const activeType = getActiveDatabaseType();
   const connError = getDatabaseConnectionError();
   res.json({
