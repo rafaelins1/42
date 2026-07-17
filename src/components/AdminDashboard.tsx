@@ -119,6 +119,7 @@ export default function AdminDashboard({
     bucketId: string;
     isUsingFallback?: boolean;
     connectionError?: string | null;
+    isNetworkError?: boolean;
     message?: string;
   } | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -136,15 +137,19 @@ export default function AdminDashboard({
         setSyncStatus({
           enabled: false,
           lastSynced: null,
-          cloudUrl: 'Armazenamento',
-          bucketId: 'Erro',
-          connectionError: `Não foi possível obter o status de sincronização: ${err.message || err}`
+          cloudUrl: 'Servidor',
+          bucketId: 'Offline',
+          isNetworkError: true,
+          connectionError: `O servidor está reiniciando ou indisponível temporariamente. Por favor, aguarde alguns segundos e clique em "Tentar Novamente". (${err.message || err})`
         });
       });
   };
 
   React.useEffect(() => {
     fetchSyncStatus();
+    // Poll sync status every 15 seconds to keep it fresh and automatically recover from restarts
+    const interval = setInterval(fetchSyncStatus, 15000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleToggleSync = (enabled: boolean) => {
@@ -1182,21 +1187,39 @@ export default function AdminDashboard({
                       <div className="p-3.5 bg-red-500/10 border border-red-500/30 rounded-lg text-xs leading-relaxed text-red-400 space-y-2">
                         <div className="flex items-center gap-1.5 font-bold text-white">
                           <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
-                          <span>Falha na Conexão com o Banco de Dados</span>
+                          <span>
+                            {syncStatus.isNetworkError 
+                              ? 'Conectando ao Servidor...' 
+                              : 'Falha na Conexão com o Banco de Dados'}
+                          </span>
                         </div>
                         <p className="text-neutral-300 font-medium">
                           {syncStatus.connectionError}
                         </p>
-                        <div className="text-[11px] text-neutral-400 space-y-1 pt-1 border-t border-red-500/10">
-                          <p className="font-bold text-neutral-300">Como resolver no MongoDB Atlas:</p>
-                          <ol className="list-decimal pl-4 space-y-1">
-                            <li>Acesse seu painel do <strong>MongoDB Atlas</strong>.</li>
-                            <li>Vá em <strong>Database Access</strong> e confirme seu usuário e senha.</li>
-                            <li>Substitua o marcador de posição <code className="bg-neutral-900 px-1 py-0.5 rounded text-white">&lt;db_password&gt;</code> na sua URI de conexão.</li>
-                            <li><strong>Importante:</strong> Certifique-se de remover também os sinais de menor e maior (<code className="text-white">&lt;</code> e <code className="text-white">&gt;</code>).</li>
-                            <li>Insira a URI corrigida nas <strong>Configurações (Secrets)</strong> da barra lateral esquerda do AI Studio.</li>
-                          </ol>
-                        </div>
+                        
+                        {syncStatus.isNetworkError ? (
+                          <div className="pt-2 flex items-center justify-between border-t border-red-500/10">
+                            <span className="text-[10px] text-neutral-500 animate-pulse">Tentando reconectar automaticamente...</span>
+                            <button
+                              onClick={fetchSyncStatus}
+                              className="px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-md text-[11px] font-semibold text-white transition-all flex items-center gap-1 active:scale-95 cursor-pointer"
+                            >
+                              <RefreshCw className="w-3 h-3 text-purple-500" />
+                              Tentar Novamente
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="text-[11px] text-neutral-400 space-y-1 pt-1 border-t border-red-500/10">
+                            <p className="font-bold text-neutral-300">Como resolver no MongoDB Atlas:</p>
+                            <ol className="list-decimal pl-4 space-y-1">
+                              <li>Acesse seu painel do <strong>MongoDB Atlas</strong>.</li>
+                              <li>Vá em <strong>Database Access</strong> e confirme seu usuário e senha.</li>
+                              <li>Substitua o marcador de posição <code className="bg-neutral-900 px-1 py-0.5 rounded text-white">&lt;db_password&gt;</code> na sua URI de conexão.</li>
+                              <li><strong>Importante:</strong> Certifique-se de remover também os sinais de menor e maior (<code className="text-white">&lt;</code> e <code className="text-white">&gt;</code>).</li>
+                              <li>Insira a URI corrigida nas <strong>Configurações (Secrets)</strong> da barra lateral esquerda do AI Studio.</li>
+                            </ol>
+                          </div>
+                        )}
                       </div>
                     )}
 
