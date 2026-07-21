@@ -347,7 +347,7 @@ export async function saveDatabase(db: any): Promise<boolean> {
  * Helper to get the current loaded or cached database
  */
 export async function getDatabaseSynced(): Promise<any> {
-  if (memoryCache) {
+  if (memoryCache && (!process.env.MONGODB_URI || connectedUri === process.env.MONGODB_URI)) {
     return memoryCache;
   }
   return loadDatabase();
