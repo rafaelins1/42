@@ -162,7 +162,16 @@ async function getMongoClient() {
     return mongoClient;
   } catch (error: any) {
     console.error('Failed to connect to MongoDB Atlas:', error);
-    lastConnectionError = error?.message || String(error);
+    let rawMsg = error?.message || String(error);
+    if (rawMsg.includes('bad auth') || rawMsg.includes('Authentication failed') || rawMsg.includes('auth failed')) {
+      lastConnectionError = 'Falha de Autenticação: O usuário ou a senha informados na MONGODB_URI estão incorretos. Verifique se atualizou a senha do usuário no MongoDB Atlas e colou o link correto nos Secrets.';
+    } else if (rawMsg.includes('querySrv') || rawMsg.includes('ENOTFOUND') || rawMsg.includes('EBADNAME')) {
+      lastConnectionError = 'Endereço do Cluster Inexistente: O link do MongoDB possui um nome de servidor/cluster incorreto. Verifique a MONGODB_URI obtida no botão "Connect" do MongoDB Atlas.';
+    } else if (rawMsg.includes('selection timed out') || rawMsg.includes('ETIMEDOUT') || rawMsg.includes('connect ETIMEDOUT')) {
+      lastConnectionError = 'Bloqueio de IP / Tempo Esgotado: O MongoDB Atlas não permitiu a conexão. Certifique-se de ir em "Network Access" no Atlas, adicionar "0.0.0.0/0" e clicar no botão verde "Confirm". (Pode levar até 2 minutos para aplicar).';
+    } else {
+      lastConnectionError = `Erro no MongoDB Atlas: ${rawMsg}`;
+    }
     mongoClient = null;
     mongoDb = null;
     connectedUri = null;
