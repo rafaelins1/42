@@ -140,8 +140,9 @@ async function getMongoClient() {
   try {
     console.log('Connecting to user-managed MongoDB Atlas with cleaned URI...');
     mongoClient = new MongoClient(cleanedUri, {
-      connectTimeoutMS: 5000,
-      socketTimeoutMS: 5000,
+      connectTimeoutMS: 4000,
+      socketTimeoutMS: 4000,
+      serverSelectionTimeoutMS: 4000,
     });
     await mongoClient.connect();
     

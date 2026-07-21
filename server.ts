@@ -16,97 +16,137 @@ app.use(express.json({ limit: '10mb' }));
 
 // API Endpoints
 app.get('/api/db', async (req, res) => {
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-  const db = await getDatabaseSynced();
-  res.json(db);
+  try {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    const db = await getDatabaseSynced();
+    res.json(db);
+  } catch (err: any) {
+    console.error('Error in GET /api/db:', err);
+    res.status(500).json({ error: err?.message || 'Erro ao carregar banco de dados' });
+  }
 });
 
 app.post('/api/db/products', async (req, res) => {
-  const { products } = req.body;
-  if (!Array.isArray(products)) {
-    return res.status(400).json({ error: 'Invalid products array' });
+  try {
+    const { products } = req.body;
+    if (!Array.isArray(products)) {
+      return res.status(400).json({ error: 'Invalid products array' });
+    }
+    const db = await getDatabaseSynced();
+    db.products = products;
+    await saveDatabase(db);
+    res.json({ success: true, products: db.products });
+  } catch (err: any) {
+    console.error('Error in POST /api/db/products:', err);
+    res.status(500).json({ error: err?.message || 'Erro ao salvar produtos' });
   }
-  const db = await getDatabaseSynced();
-  db.products = products;
-  await saveDatabase(db);
-  res.json({ success: true, products: db.products });
 });
 
 app.post('/api/db/categories', async (req, res) => {
-  const { categories } = req.body;
-  if (!Array.isArray(categories)) {
-    return res.status(400).json({ error: 'Invalid categories array' });
+  try {
+    const { categories } = req.body;
+    if (!Array.isArray(categories)) {
+      return res.status(400).json({ error: 'Invalid categories array' });
+    }
+    const db = await getDatabaseSynced();
+    db.categories = categories;
+    await saveDatabase(db);
+    res.json({ success: true, categories: db.categories });
+  } catch (err: any) {
+    console.error('Error in POST /api/db/categories:', err);
+    res.status(500).json({ error: err?.message || 'Erro ao salvar categorias' });
   }
-  const db = await getDatabaseSynced();
-  db.categories = categories;
-  await saveDatabase(db);
-  res.json({ success: true, categories: db.categories });
 });
 
 app.post('/api/db/settings', async (req, res) => {
-  const { settings } = req.body;
-  if (!settings || typeof settings !== 'object') {
-    return res.status(400).json({ error: 'Invalid settings object' });
+  try {
+    const { settings } = req.body;
+    if (!settings || typeof settings !== 'object') {
+      return res.status(400).json({ error: 'Invalid settings object' });
+    }
+    const db = await getDatabaseSynced();
+    db.settings = settings;
+    await saveDatabase(db);
+    res.json({ success: true, settings: db.settings });
+  } catch (err: any) {
+    console.error('Error in POST /api/db/settings:', err);
+    res.status(500).json({ error: err?.message || 'Erro ao salvar configurações' });
   }
-  const db = await getDatabaseSynced();
-  db.settings = settings;
-  await saveDatabase(db);
-  res.json({ success: true, settings: db.settings });
 });
 
 app.post('/api/db/passcode', async (req, res) => {
-  const { passcode } = req.body;
-  if (typeof passcode !== 'string' || passcode.length !== 8) {
-    return res.status(400).json({ error: 'Passcode must be an 8-digit string' });
+  try {
+    const { passcode } = req.body;
+    if (typeof passcode !== 'string' || passcode.length !== 8) {
+      return res.status(400).json({ error: 'Passcode must be an 8-digit string' });
+    }
+    const db = await getDatabaseSynced();
+    db.passcode = passcode;
+    await saveDatabase(db);
+    res.json({ success: true, passcode: db.passcode });
+  } catch (err: any) {
+    console.error('Error in POST /api/db/passcode:', err);
+    res.status(500).json({ error: err?.message || 'Erro ao salvar senha' });
   }
-  const db = await getDatabaseSynced();
-  db.passcode = passcode;
-  await saveDatabase(db);
-  res.json({ success: true, passcode: db.passcode });
 });
 
 app.post('/api/db/orders', async (req, res) => {
-  const { orders } = req.body;
-  if (!Array.isArray(orders)) {
-    return res.status(400).json({ error: 'Invalid orders array' });
+  try {
+    const { orders } = req.body;
+    if (!Array.isArray(orders)) {
+      return res.status(400).json({ error: 'Invalid orders array' });
+    }
+    const db = await getDatabaseSynced();
+    db.orders = orders;
+    await saveDatabase(db);
+    res.json({ success: true, orders: db.orders });
+  } catch (err: any) {
+    console.error('Error in POST /api/db/orders:', err);
+    res.status(500).json({ error: err?.message || 'Erro ao salvar pedidos' });
   }
-  const db = await getDatabaseSynced();
-  db.orders = orders;
-  await saveDatabase(db);
-  res.json({ success: true, orders: db.orders });
 });
 
 app.post('/api/db/orders/add', async (req, res) => {
-  const { order } = req.body;
-  if (!order || typeof order !== 'object') {
-    return res.status(400).json({ error: 'Invalid order object' });
+  try {
+    const { order } = req.body;
+    if (!order || typeof order !== 'object') {
+      return res.status(400).json({ error: 'Invalid order object' });
+    }
+    const db = await getDatabaseSynced();
+    db.orders = [order, ...db.orders];
+    await saveDatabase(db);
+    res.json({ success: true, order });
+  } catch (err: any) {
+    console.error('Error in POST /api/db/orders/add:', err);
+    res.status(500).json({ error: err?.message || 'Erro ao adicionar pedido' });
   }
-  const db = await getDatabaseSynced();
-  db.orders = [order, ...db.orders];
-  await saveDatabase(db);
-  res.json({ success: true, order });
 });
 
 // Sync Status API endpoints
 app.get('/api/db/sync-status', async (req, res) => {
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-  const activeType = getActiveDatabaseType();
-  const connError = getDatabaseConnectionError();
-  res.json({
-    enabled: activeType !== 'Local' && !connError,
-    lastSynced: new Date().toISOString(),
-    activeDatabase: activeType,
-    mongoConfigured: !!process.env.MONGODB_URI,
-    firebaseConfigured: !!process.env.FIREBASE_SERVICE_ACCOUNT,
-    bucketId: activeType,
-    cloudUrl: activeType === 'MongoDB' ? 'MongoDB Atlas Cluster' : activeType === 'Firestore' ? 'Google Cloud Firestore' : 'Armazenamento Local',
-    connectionError: connError,
-    message: connError
-      ? `Falha na Conexão: ${connError}`
-      : activeType === 'Local'
-        ? 'Executando em modo de armazenamento local temporário. Para persistência definitiva, adicione a variável MONGODB_URI ou FIREBASE_SERVICE_ACCOUNT nos Secrets da barra lateral.'
-        : `Conectado com sucesso ao seu próprio banco de dados (${activeType})!`
-  });
+  try {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    const activeType = getActiveDatabaseType();
+    const connError = getDatabaseConnectionError();
+    res.json({
+      enabled: activeType !== 'Local' && !connError,
+      lastSynced: new Date().toISOString(),
+      activeDatabase: activeType,
+      mongoConfigured: !!process.env.MONGODB_URI,
+      firebaseConfigured: !!process.env.FIREBASE_SERVICE_ACCOUNT,
+      bucketId: activeType,
+      cloudUrl: activeType === 'MongoDB' ? 'MongoDB Atlas Cluster' : activeType === 'Firestore' ? 'Google Cloud Firestore' : 'Armazenamento Local',
+      connectionError: connError,
+      message: connError
+        ? `Falha na Conexão: ${connError}`
+        : activeType === 'Local'
+          ? 'Executando em modo de armazenamento local temporário. Para persistência definitiva, adicione a variável MONGODB_URI ou FIREBASE_SERVICE_ACCOUNT nos Secrets da barra lateral.'
+          : `Conectado com sucesso ao seu próprio banco de dados (${activeType})!`
+    });
+  } catch (err: any) {
+    console.error('Error in GET /api/db/sync-status:', err);
+    res.status(500).json({ error: err?.message || 'Erro ao checar status de sincronização' });
+  }
 });
 
 app.post('/api/db/sync-status/toggle', (req, res) => {
@@ -114,17 +154,27 @@ app.post('/api/db/sync-status/toggle', (req, res) => {
 });
 
 app.post('/api/db/sync/force-pull', async (req, res) => {
-  const db = await loadDatabase();
-  res.json({ success: true, message: `Dados atualizados com sucesso de seu banco ${getActiveDatabaseType()}!`, db });
+  try {
+    const db = await loadDatabase();
+    res.json({ success: true, message: `Dados atualizados com sucesso de seu banco ${getActiveDatabaseType()}!`, db });
+  } catch (err: any) {
+    console.error('Error in POST /api/db/sync/force-pull:', err);
+    res.status(500).json({ error: err?.message || 'Erro ao buscar dados do banco' });
+  }
 });
 
 app.post('/api/db/sync/force-push', async (req, res) => {
-  const db = await getDatabaseSynced();
-  const success = await saveDatabase(db);
-  if (success) {
-    res.json({ success: true, message: `Dados enviados com sucesso para seu banco ${getActiveDatabaseType()}!` });
-  } else {
-    res.status(500).json({ error: 'Erro ao enviar dados.' });
+  try {
+    const db = await getDatabaseSynced();
+    const success = await saveDatabase(db);
+    if (success) {
+      res.json({ success: true, message: `Dados enviados com sucesso para seu banco ${getActiveDatabaseType()}!` });
+    } else {
+      res.status(500).json({ error: 'Erro ao enviar dados.' });
+    }
+  } catch (err: any) {
+    console.error('Error in POST /api/db/sync/force-push:', err);
+    res.status(500).json({ error: err?.message || 'Erro ao enviar dados para o banco' });
   }
 });
 
