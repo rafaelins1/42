@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Main store configuration and catalog
+    match /tabas_store/{documentId} {
+      allow read: if isValidId(documentId);
+      allow write: if isValidId(documentId);
+    }
+
+    // Customer orders
+    match /orders/{orderId} {
+      allow read: if isValidId(orderId);
+      allow create: if isValidId(orderId) 
+                    && request.resource.data.keys().hasAll(['id', 'customer', 'items', 'total', 'status', 'createdAt'])
+                    && request.resource.data.id is string
+                    && request.resource.data.total is number
+                    && request.resource.data.status is string;
+      allow update: if isValidId(orderId);
+      allow delete: if isValidId(orderId);
+    }
+
+    // Connection test document
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+  }
+}

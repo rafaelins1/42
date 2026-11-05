@@ -1,10 +1,13 @@
 import { MongoClient, Db } from 'mongodb';
 import { Firestore } from '@google-cloud/firestore';
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getFirestore, doc, getDoc, setDoc, Firestore as ClientFirestore } from 'firebase/firestore';
 import fs from 'fs';
 import path from 'path';
 import { initialProducts, initialCategories, defaultSettings } from './src/data/mockProducts';
 
 const DB_PATH = path.join(process.cwd(), 'src', 'data', 'db.json');
+const FIREBASE_CONFIG_PATH = path.join(process.cwd(), 'firebase-applet-config.json');
 
 // Memory cache to avoid reading database constantly
 let memoryCache: any = null;
@@ -21,6 +24,36 @@ function getDefaults() {
 }
 
 // ------------------
+// Firebase Firestore Client (via firebase-applet-config.json)
+// ------------------
+let appletFirestore: ClientFirestore | null = null;
+
+function getAppletFirestore(): ClientFirestore | null {
+  if (appletFirestore) return appletFirestore;
+  try {
+    let config: any = null;
+    if (process.env.FIREBASE_CONFIG) {
+      try {
+        config = JSON.parse(process.env.FIREBASE_CONFIG);
+      } catch (e) {}
+    }
+    if (!config && fs.existsSync(FIREBASE_CONFIG_PATH)) {
+      const configRaw = fs.readFileSync(FIREBASE_CONFIG_PATH, 'utf-8');
+      config = JSON.parse(configRaw);
+    }
+    if (config && config.projectId && config.apiKey) {
+      const app = getApps().length === 0 ? initializeApp(config) : getApp();
+      appletFirestore = getFirestore(app, config.firestoreDatabaseId || undefined);
+      console.log(`Firebase Firestore initialized for project: ${config.projectId}`);
+      return appletFirestore;
+    }
+  } catch (err) {
+    console.error('Failed to initialize Firestore from firebase-applet-config.json:', err);
+  }
+  return null;
+}
+
+// ------------------
 // MongoDB Provider (Lazy Initialized)
 // ------------------
 let mongoClient: MongoClient | null = null;
@@ -31,15 +64,11 @@ let connectedUri: string | null = null;
 export function cleanMongoUri(uri: string): string {
   if (!uri) return uri;
   
-  // Trim any whitespace
   let cleaned = uri.trim();
-  
-  // Also strip any literal quotes that might have been pasted
   if ((cleaned.startsWith('"') && cleaned.endsWith('"')) || (cleaned.startsWith("'") && cleaned.endsWith("'"))) {
     cleaned = cleaned.slice(1, -1).trim();
   }
 
-  // Find protocol
   let protocol = '';
   if (cleaned.startsWith('mongodb+srv://')) {
     protocol = 'mongodb+srv://';
@@ -50,8 +79,6 @@ export function cleanMongoUri(uri: string): string {
   }
 
   const rest = cleaned.substring(protocol.length);
-  
-  // Separate credentials from host
   let boundary = rest.length;
   const firstSlash = rest.indexOf('/');
   const firstQuestion = rest.indexOf('?');
@@ -62,38 +89,28 @@ export function cleanMongoUri(uri: string): string {
   const afterBoundary = rest.substring(boundary);
   
   const lastAt = beforeBoundary.lastIndexOf('@');
-  if (lastAt === -1) {
-    return cleaned;
-  }
+  if (lastAt === -1) return cleaned;
   
   const credentials = beforeBoundary.substring(0, lastAt);
   const hostPart = beforeBoundary.substring(lastAt + 1) + afterBoundary;
   
   const firstColon = credentials.indexOf(':');
-  if (firstColon === -1) {
-    return cleaned;
-  }
+  if (firstColon === -1) return cleaned;
   
   const username = credentials.substring(0, firstColon);
   let password = credentials.substring(firstColon + 1).trim();
   
-  // 1. Strip outer "<" and ">" if present
   if (password.startsWith('<') && password.endsWith('>')) {
     password = password.slice(1, -1).trim();
   }
-  
-  // 2. Also strip escaped HTML-like brackets if pasted
   if (password.startsWith('&lt;') && password.endsWith('&gt;')) {
     password = password.slice(4, -4).trim();
   }
   
-  // 3. Percent-encode the password to escape special characters like '@', ':', '/', etc.
   let decodedPassword = password;
   try {
     decodedPassword = decodeURIComponent(password);
-  } catch (e) {
-    // ignore
-  }
+  } catch (e) {}
   
   const encodedPassword = encodeURIComponent(decodedPassword);
   return `${protocol}${username}:${encodedPassword}@${hostPart}`;
@@ -102,7 +119,7 @@ export function cleanMongoUri(uri: string): string {
 export function getDatabaseConnectionError(): string | null {
   const uri = process.env.MONGODB_URI;
   if (uri && (uri.includes('<db_password>') || uri.includes('<password>') || uri.includes('<db-password>') || uri.includes('<dbPassword>') || uri.includes('<senha>'))) {
-    return "Você precisa substituir o marcador de posição '<db_password>' por sua senha real que você definiu no painel do MongoDB Atlas (lembre-se de remover também os sinais de menor/maior '<' e '>').";
+    return "Você precisa substituir o marcador de posição '<db_password>' por sua senha real que você definiu no painel do MongoDB Atlas.";
   }
   return lastConnectionError;
 }
@@ -115,30 +132,23 @@ async function getMongoClient() {
     return mongoClient;
   }
 
-  // If the URI changed, close previous client and clear cache
   if (mongoClient && connectedUri !== uri) {
-    console.log('MONGODB_URI changed. Re-initializing MongoDB Atlas client...');
     try {
       await mongoClient.close();
-    } catch (e) {
-      // ignore
-    }
+    } catch (e) {}
     mongoClient = null;
     mongoDb = null;
     lastConnectionError = null;
   }
 
-  // Validate placeholder before attempting connection
   if (uri.includes('<db_password>') || uri.includes('<password>') || uri.includes('<db-password>') || uri.includes('<dbPassword>') || uri.includes('<senha>')) {
-    lastConnectionError = "Você precisa substituir o marcador de posição '<db_password>' por sua senha real que você definiu no painel do MongoDB Atlas (lembre-se de remover também os sinais de menor/maior '<' e '>').";
-    console.error(lastConnectionError);
+    lastConnectionError = "Você precisa substituir o marcador de posição '<db_password>' por sua senha real no MongoDB Atlas.";
     return null;
   }
 
   const cleanedUri = cleanMongoUri(uri);
 
   try {
-    console.log('Connecting to user-managed MongoDB Atlas with cleaned URI...');
     mongoClient = new MongoClient(cleanedUri, {
       connectTimeoutMS: 4000,
       socketTimeoutMS: 4000,
@@ -146,7 +156,6 @@ async function getMongoClient() {
     });
     await mongoClient.connect();
     
-    // Parse Database Name from URI, default to 'tabas_db'
     let dbName = 'tabas_db';
     if (cleanedUri.includes('mongodb.net/')) {
       const parts = cleanedUri.split('mongodb.net/');
@@ -156,22 +165,12 @@ async function getMongoClient() {
     }
     
     mongoDb = mongoClient.db(dbName);
-    console.log(`Connected to MongoDB Atlas successfully! Database: ${dbName}`);
-    lastConnectionError = null; // Clear any previous error
-    connectedUri = uri; // Save successfully connected URI
+    lastConnectionError = null;
+    connectedUri = uri;
     return mongoClient;
   } catch (error: any) {
     console.error('Failed to connect to MongoDB Atlas:', error);
-    let rawMsg = error?.message || String(error);
-    if (rawMsg.includes('bad auth') || rawMsg.includes('Authentication failed') || rawMsg.includes('auth failed')) {
-      lastConnectionError = 'Falha de Autenticação: O usuário ou a senha informados na MONGODB_URI estão incorretos. Verifique se atualizou a senha do usuário no MongoDB Atlas e colou o link correto nos Secrets.';
-    } else if (rawMsg.includes('querySrv') || rawMsg.includes('ENOTFOUND') || rawMsg.includes('EBADNAME')) {
-      lastConnectionError = 'Endereço do Cluster Inexistente: O link do MongoDB possui um nome de servidor/cluster incorreto. Verifique a MONGODB_URI obtida no botão "Connect" do MongoDB Atlas.';
-    } else if (rawMsg.includes('selection timed out') || rawMsg.includes('ETIMEDOUT') || rawMsg.includes('connect ETIMEDOUT')) {
-      lastConnectionError = 'Bloqueio de IP / Tempo Esgotado: O MongoDB Atlas não permitiu a conexão. Certifique-se de ir em "Network Access" no Atlas, adicionar "0.0.0.0/0" e clicar no botão verde "Confirm". (Pode levar até 2 minutos para aplicar).';
-    } else {
-      lastConnectionError = `Erro no MongoDB Atlas: ${rawMsg}`;
-    }
+    lastConnectionError = `Erro no MongoDB Atlas: ${error?.message || error}`;
     mongoClient = null;
     mongoDb = null;
     connectedUri = null;
@@ -180,36 +179,32 @@ async function getMongoClient() {
 }
 
 // ------------------
-// Firestore Provider (Lazy Initialized)
+// Service Account Firestore Provider (Fallback if provided)
 // ------------------
-let firestoreDb: Firestore | null = null;
+let serviceAccountFirestore: Firestore | null = null;
 
-function getFirestoreClient() {
+function getServiceAccountFirestore() {
   const serviceAccountStr = process.env.FIREBASE_SERVICE_ACCOUNT;
   if (!serviceAccountStr) return null;
-  if (firestoreDb) return firestoreDb;
+  if (serviceAccountFirestore) return serviceAccountFirestore;
 
   try {
-    console.log('Initializing user-managed Firebase Firestore...');
     const serviceAccount = JSON.parse(serviceAccountStr);
-    
-    // Ensure the private key has correct newline characters
     if (serviceAccount.private_key) {
       serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
     }
 
-    firestoreDb = new Firestore({
+    serviceAccountFirestore = new Firestore({
       projectId: serviceAccount.project_id,
       credentials: {
         client_email: serviceAccount.client_email,
         private_key: serviceAccount.private_key,
       }
     });
-    console.log('Firebase Firestore client initialized successfully!');
-    return firestoreDb;
+    return serviceAccountFirestore;
   } catch (error) {
-    console.error('Failed to initialize Firebase Firestore client:', error);
-    firestoreDb = null;
+    console.error('Failed to initialize Service Account Firestore:', error);
+    serviceAccountFirestore = null;
     return null;
   }
 }
@@ -219,10 +214,64 @@ function getFirestoreClient() {
 // ------------------
 
 /**
- * Loads the entire database from MongoDB, Firestore, or local db.json fallback
+ * Loads the entire database from Firebase Firestore, MongoDB, or local db.json fallback
  */
 export async function loadDatabase(): Promise<any> {
-  // 1. Try MongoDB Atlas if MONGODB_URI is provided
+  // 1. Primary: Firebase Firestore provisioned via AI Studio
+  const appletDb = getAppletFirestore();
+  if (appletDb) {
+    try {
+      const docRef = doc(appletDb, 'tabas_store', 'main_store');
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const cloudData = docSnap.data();
+        memoryCache = { ...getDefaults(), ...cloudData };
+        // Sync local file as offline mirror
+        try {
+          fs.writeFileSync(DB_PATH, JSON.stringify(memoryCache, null, 2), 'utf-8');
+        } catch (e) {}
+        return memoryCache;
+      } else {
+        console.log('No existing document in Firestore tabas_store/main_store. Seeding data...');
+        let initialData = getDefaults();
+        if (fs.existsSync(DB_PATH)) {
+          try {
+            const localData = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+            initialData = { ...initialData, ...localData };
+          } catch (e) {}
+        }
+        await setDoc(docRef, initialData);
+        memoryCache = initialData;
+        return memoryCache;
+      }
+    } catch (err) {
+      console.error('Error loading database from Applet Firestore:', err);
+    }
+  }
+
+  // 2. Secondary: Firestore via Service Account
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    try {
+      const db = getServiceAccountFirestore();
+      if (db) {
+        const docRef = db.collection('tabas_store').doc('main_store');
+        const docSnap = await docRef.get();
+        if (docSnap.exists) {
+          memoryCache = { ...getDefaults(), ...docSnap.data() };
+          return memoryCache;
+        } else {
+          const defaults = getDefaults();
+          await docRef.set(defaults);
+          memoryCache = defaults;
+          return memoryCache;
+        }
+      }
+    } catch (err) {
+      console.error('Error loading database from Service Account Firestore:', err);
+    }
+  }
+
+  // 3. Tertiary: MongoDB Atlas
   if (process.env.MONGODB_URI) {
     try {
       const client = await getMongoClient();
@@ -234,7 +283,6 @@ export async function loadDatabase(): Promise<any> {
           memoryCache = { ...getDefaults(), ...rest };
           return memoryCache;
         } else {
-          console.log('No existing document in MongoDB. Creating with defaults...');
           const defaults = getDefaults();
           await collection.updateOne(
             { _id: 'main_store' as any },
@@ -246,34 +294,11 @@ export async function loadDatabase(): Promise<any> {
         }
       }
     } catch (err) {
-      console.error('Error loading database from MongoDB Atlas, falling back to local file:', err);
+      console.error('Error loading database from MongoDB Atlas:', err);
     }
   }
 
-  // 2. Try Firestore if FIREBASE_SERVICE_ACCOUNT is provided
-  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    try {
-      const db = getFirestoreClient();
-      if (db) {
-        const docRef = db.collection('tabas_config').doc('main_store');
-        const docSnap = await docRef.get();
-        if (docSnap.exists) {
-          memoryCache = { ...getDefaults(), ...docSnap.data() };
-          return memoryCache;
-        } else {
-          console.log('No existing document in Firestore. Creating with defaults...');
-          const defaults = getDefaults();
-          await docRef.set(defaults);
-          memoryCache = defaults;
-          return memoryCache;
-        }
-      }
-    } catch (err) {
-      console.error('Error loading database from Firestore, falling back to local file:', err);
-    }
-  }
-
-  // 3. Fallback to local JSON file
+  // 4. Fallback to local JSON file
   try {
     if (fs.existsSync(DB_PATH)) {
       const data = fs.readFileSync(DB_PATH, 'utf-8');
@@ -284,8 +309,6 @@ export async function loadDatabase(): Promise<any> {
     console.error('Error reading local db.json file:', err);
   }
 
-  // Create default db.json if not exists
-  console.log('No local db.json found. Creating default local database...');
   const defaults = getDefaults();
   const dir = path.dirname(DB_PATH);
   try {
@@ -293,20 +316,48 @@ export async function loadDatabase(): Promise<any> {
       fs.mkdirSync(dir, { recursive: true });
     }
     fs.writeFileSync(DB_PATH, JSON.stringify(defaults, null, 2), 'utf-8');
-  } catch (err) {
-    console.error('Failed to write default db.json on read-only filesystem:', err);
-  }
+  } catch (err) {}
   memoryCache = defaults;
   return memoryCache;
 }
 
 /**
- * Saves the entire database to MongoDB, Firestore, or local db.json fallback
+ * Saves the entire database to Firestore, MongoDB, or local fallback
  */
 export async function saveDatabase(db: any): Promise<boolean> {
   memoryCache = db;
 
-  // 1. Save to MongoDB Atlas
+  // 1. Primary: Save to Firebase Firestore
+  const appletDb = getAppletFirestore();
+  if (appletDb) {
+    try {
+      const docRef = doc(appletDb, 'tabas_store', 'main_store');
+      await setDoc(docRef, db);
+      // Keep local file in sync
+      try {
+        fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2), 'utf-8');
+      } catch (e) {}
+      return true;
+    } catch (err) {
+      console.error('Failed to save to Applet Firestore:', err);
+    }
+  }
+
+  // 2. Secondary: Firestore Service Account
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    try {
+      const client = getServiceAccountFirestore();
+      if (client) {
+        const docRef = client.collection('tabas_store').doc('main_store');
+        await docRef.set(db, { merge: true });
+        return true;
+      }
+    } catch (err) {
+      console.error('Failed to save to Service Account Firestore:', err);
+    }
+  }
+
+  // 3. Tertiary: Save to MongoDB Atlas
   if (process.env.MONGODB_URI) {
     try {
       const client = await getMongoClient();
@@ -324,21 +375,7 @@ export async function saveDatabase(db: any): Promise<boolean> {
     }
   }
 
-  // 2. Save to Firestore
-  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    try {
-      const client = getFirestoreClient();
-      if (client) {
-        const docRef = client.collection('tabas_config').doc('main_store');
-        await docRef.set(db, { merge: true });
-        return true;
-      }
-    } catch (err) {
-      console.error('Failed to save to Firestore:', err);
-    }
-  }
-
-  // 3. Save to local file
+  // 4. Local file fallback
   try {
     const dir = path.dirname(DB_PATH);
     if (!fs.existsSync(dir)) {
@@ -356,8 +393,7 @@ export async function saveDatabase(db: any): Promise<boolean> {
  * Helper to get the current loaded or cached database
  */
 export async function getDatabaseSynced(): Promise<any> {
-  // Always load fresh data from cloud database in serverless/multi-device environments
-  if (process.env.MONGODB_URI || process.env.FIREBASE_SERVICE_ACCOUNT) {
+  if (process.env.FIREBASE_CONFIG || fs.existsSync(FIREBASE_CONFIG_PATH) || process.env.FIREBASE_SERVICE_ACCOUNT || process.env.MONGODB_URI) {
     return loadDatabase();
   }
   if (memoryCache) {
@@ -369,8 +405,8 @@ export async function getDatabaseSynced(): Promise<any> {
 /**
  * Returns which database type is currently active
  */
-export function getActiveDatabaseType(): 'MongoDB' | 'Firestore' | 'Local' {
+export function getActiveDatabaseType(): 'Firestore' | 'MongoDB' | 'Local' {
+  if (process.env.FIREBASE_CONFIG || fs.existsSync(FIREBASE_CONFIG_PATH) || process.env.FIREBASE_SERVICE_ACCOUNT) return 'Firestore';
   if (process.env.MONGODB_URI) return 'MongoDB';
-  if (process.env.FIREBASE_SERVICE_ACCOUNT) return 'Firestore';
   return 'Local';
 }

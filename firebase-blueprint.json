@@ -1,0 +1,81 @@
+{
+  "entities": {
+    "StoreData": {
+      "title": "StoreData",
+      "description": "Master store data including catalog, categories, settings, orders, and admin passcode",
+      "type": "object",
+      "properties": {
+        "products": {
+          "type": "array",
+          "description": "List of products in catalog"
+        },
+        "categories": {
+          "type": "array",
+          "description": "List of categories"
+        },
+        "settings": {
+          "type": "object",
+          "description": "Store settings like name, WhatsApp, PIX, delivery rates"
+        },
+        "orders": {
+          "type": "array",
+          "description": "Customer orders"
+        },
+        "passcode": {
+          "type": "string",
+          "description": "8-digit admin passcode",
+          "minLength": 8,
+          "maxLength": 8
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last update"
+        }
+      },
+      "required": ["products", "categories", "settings", "passcode"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Individual customer order for real-time order tracking",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique order identifier"
+        },
+        "customer": {
+          "type": "object",
+          "description": "Customer name, phone, address, and delivery type"
+        },
+        "items": {
+          "type": "array",
+          "description": "List of ordered items with quantities and prices"
+        },
+        "total": {
+          "type": "number",
+          "description": "Total order amount in BRL"
+        },
+        "status": {
+          "type": "string",
+          "description": "Order fulfillment status",
+          "enum": ["pending", "confirmed", "delivering", "completed", "cancelled"]
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["id", "customer", "items", "total", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/tabas_store/{documentId}": {
+      "schema": "StoreData",
+      "description": "Master store documents including main_store"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Customer order history and status tracking"
+    }
+  }
+}

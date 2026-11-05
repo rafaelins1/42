@@ -1,0 +1,6 @@
+{
+  "summary": "Plano de implementação detalhado para integração completa do Firebase Firestore na nuvem do TabasGestion, permitindo sincronização em tempo real e persistência permanente de produtos, categorias, pedidos, configurações da loja e senha administrativa na web.",
+  "updatedAt": "2026-11-05T18:31:17.129510245Z",
+  "requestFeedback": true,
+  "userFacing": true
+}

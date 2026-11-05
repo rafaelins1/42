@@ -9,6 +9,7 @@ import { Product, Category, StoreSettings, Order } from './types';
 import CatalogView from './components/CatalogView';
 import PasscodeGate from './components/PasscodeGate';
 import AdminDashboard from './components/AdminDashboard';
+import { subscribeToStoreData } from './firebase';
 
 export default function App() {
   const [products, setProducts] = useState<Product[]>(initialProducts);
@@ -20,6 +21,26 @@ export default function App() {
 
   // Routing state: 'catalog' | 'admin_gate' | 'admin_dashboard'
   const [currentScreen, setCurrentScreen] = useState<'catalog' | 'admin_gate' | 'admin_dashboard'>('catalog');
+
+  // Real-time Firestore sync across all open clients & devices
+  useEffect(() => {
+    const unsubscribe = subscribeToStoreData((cloudData) => {
+      if (cloudData) {
+        if (Array.isArray(cloudData.products)) setProducts(cloudData.products);
+        if (Array.isArray(cloudData.categories)) setCategories(cloudData.categories);
+        if (cloudData.settings && typeof cloudData.settings === 'object') setSettings(cloudData.settings);
+        if (Array.isArray(cloudData.orders)) setOrders(cloudData.orders);
+        if (cloudData.passcode && typeof cloudData.passcode === 'string' && cloudData.passcode.length === 8) {
+          setPasscode(cloudData.passcode);
+        }
+        setIsLoading(false);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   // Load database from full-stack server
   useEffect(() => {
@@ -44,7 +65,6 @@ export default function App() {
       })
       .catch((err) => {
         console.error('Failed to load database from server:', err);
-        // Fallback to local storage or defaults on error
         const savedProducts = localStorage.getItem('tabas_products');
         const savedCategories = localStorage.getItem('tabas_categories');
         const savedSettings = localStorage.getItem('tabas_settings');

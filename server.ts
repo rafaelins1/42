@@ -133,15 +133,17 @@ app.get('/api/db/sync-status', async (req, res) => {
       lastSynced: new Date().toISOString(),
       activeDatabase: activeType,
       mongoConfigured: !!process.env.MONGODB_URI,
-      firebaseConfigured: !!process.env.FIREBASE_SERVICE_ACCOUNT,
+      firebaseConfigured: activeType === 'Firestore' || !!process.env.FIREBASE_SERVICE_ACCOUNT,
       bucketId: activeType,
       cloudUrl: activeType === 'MongoDB' ? 'MongoDB Atlas Cluster' : activeType === 'Firestore' ? 'Google Cloud Firestore' : 'Armazenamento Local',
       connectionError: connError,
       message: connError
         ? `Falha na Conexão: ${connError}`
-        : activeType === 'Local'
-          ? 'Executando em modo de armazenamento local temporário. Para persistência definitiva, adicione a variável MONGODB_URI ou FIREBASE_SERVICE_ACCOUNT nos Secrets da barra lateral.'
-          : `Conectado com sucesso ao seu próprio banco de dados (${activeType})!`
+        : activeType === 'Firestore'
+          ? 'Conectado com sucesso ao Google Cloud Firestore em nuvem! Todos os dados e alterações estão persistidos e sincronizados na web.'
+          : activeType === 'MongoDB'
+            ? 'Conectado com sucesso ao MongoDB Atlas!'
+            : 'Executando em modo de armazenamento local temporário.'
     });
   } catch (err: any) {
     console.error('Error in GET /api/db/sync-status:', err);
