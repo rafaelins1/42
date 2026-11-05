@@ -1,101 +1,101 @@
 {
   "products": [
     {
-      "id": "kit-azul-hippster",
-      "code": "KIT-001",
-      "name": "KIT AZUL Case HIPPSTER CLUB - COMPLETO",
-      "description": "Kit completo premium montado em case anti-impacto Hippster Club azul. Contém: Case, dichavador, cuia de silicone, isqueiro Clipper recarregável, piteira de vidro, seda e porta-beck.",
-      "price": 90,
-      "promoPrice": 79.99,
-      "category": "KITS_COMPLETOS",
       "stock": 5,
+      "promoPrice": 79.99,
       "isActive": true,
+      "id": "kit-azul-hippster",
+      "description": "Kit completo premium montado em case anti-impacto Hippster Club azul. Contém: Case, dichavador, cuia de silicone, isqueiro Clipper recarregável, piteira de vidro, seda e porta-beck.",
+      "name": "KIT AZUL Case HIPPSTER CLUB - COMPLETO",
+      "category": "KITS_COMPLETOS",
+      "price": 90,
+      "code": "KIT-001",
       "featured": true
     },
     {
-      "id": "kit-laranja-hippster",
-      "code": "KIT-002",
-      "name": "KIT LARANJA Case HIPPSTER CLUB - COMPLETO",
-      "description": "Kit completo premium montado em case anti-impacto Hippster Club laranja vibrante. Perfeito para transporte seguro e discreto com todos os acessórios inclusos.",
       "price": 90,
-      "category": "KITS_COMPLETOS",
+      "name": "KIT LARANJA Case HIPPSTER CLUB - COMPLETO",
+      "featured": true,
+      "description": "Kit completo premium montado em case anti-impacto Hippster Club laranja vibrante. Perfeito para transporte seguro e discreto com todos os acessórios inclusos.",
       "stock": 4,
       "isActive": true,
-      "featured": true
+      "code": "KIT-002",
+      "id": "kit-laranja-hippster",
+      "category": "KITS_COMPLETOS"
     },
     {
       "id": "kit-premium-amarelo",
+      "promoPrice": 139.99,
+      "featured": true,
+      "stock": 3,
       "code": "KIT-003",
       "name": "KIT PREMIUM AMARELO Case HIPPSTER CLUB - COMPLETO",
-      "description": "Edição de colecionador premium. Case rígido amarelo especial contendo acessórios selecionados de alta qualidade das melhores marcas.",
-      "price": 170,
-      "promoPrice": 139.99,
-      "category": "KITS_COMPLETOS",
-      "stock": 3,
       "isActive": true,
-      "featured": true
+      "price": 170,
+      "description": "Edição de colecionador premium. Case rígido amarelo especial contendo acessórios selecionados de alta qualidade das melhores marcas.",
+      "category": "KITS_COMPLETOS"
     },
     {
-      "id": "seda-piteira-papelito",
       "code": "SED-001",
-      "name": "1 Und Seda + Piteira PAPELITO bandeja dobrável",
-      "description": "Seda king size Papelito premium Brown/Alvejada + piteira em papel de alta qualidade, com bandeja dobrável integrada no livreto.",
+      "id": "seda-piteira-papelito",
+      "isActive": true,
+      "stock": 35,
       "price": 8.5,
       "category": "SEDA_BLUNTS",
-      "stock": 35,
-      "isActive": true
+      "name": "1 Und Seda + Piteira PAPELITO bandeja dobrável",
+      "description": "Seda king size Papelito premium Brown/Alvejada + piteira em papel de alta qualidade, com bandeja dobrável integrada no livreto."
     },
     {
       "id": "seda-blue-silk",
       "code": "SED-002",
-      "name": "1 Und Seda BLUE SILK",
-      "description": "Seda de alta qualidade com combustão lenta e papel extra fino. Ótimo custo-benefício para o dia a dia.",
-      "price": 1.11,
       "category": "SEDA_BLUNTS",
       "stock": 120,
+      "description": "Seda de alta qualidade com combustão lenta e papel extra fino. Ótimo custo-benefício para o dia a dia.",
+      "price": 1.11,
+      "name": "1 Und Seda BLUE SILK",
       "isActive": true
     },
     {
-      "id": "seda-bros-rosa",
-      "code": "SED-003",
-      "name": "1 Und Seda BROS rosa (66 folhas)",
-      "description": "Seda Bros cor de rosa super charmosa com 66 folhas. Papel fino, queima lenta e cola orgânica natural.",
-      "price": 5.5,
-      "category": "SEDA_BLUNTS",
-      "stock": 40,
-      "isActive": true
-    },
-    {
-      "id": "piteira-vidro-penguim-xl",
-      "code": "PIT-001",
-      "name": "Piteira de Vidro PENGUIM XL",
-      "description": "Piteira de vidro borossilicato Penguim XL. Reduz danos, resfria a fumaça e é totalmente lavável e reutilizável.",
-      "price": 70,
-      "promoPrice": 60,
-      "category": "PITEIRAS_VIDRO",
-      "stock": 12,
       "isActive": true,
-      "featured": true
+      "description": "Seda Bros cor de rosa super charmosa com 66 folhas. Papel fino, queima lenta e cola orgânica natural.",
+      "stock": 40,
+      "price": 5.5,
+      "name": "1 Und Seda BROS rosa (66 folhas)",
+      "code": "SED-003",
+      "category": "SEDA_BLUNTS",
+      "id": "seda-bros-rosa"
     },
     {
-      "id": "dichavador-cubo-lrc",
-      "code": "DIC-001",
-      "name": "1 Und Dichavador Cubo LION ROLLING CIRCUS 4 partes",
-      "description": "Dichavador premium formato de cubo oficial Lion Rolling Circus. 4 partes com tela coletora de kief e dentes de metal ultra resistentes.",
+      "featured": true,
+      "code": "PIT-001",
+      "promoPrice": 60,
+      "stock": 12,
+      "description": "Piteira de vidro borossilicato Penguim XL. Reduz danos, resfria a fumaça e é totalmente lavável e reutilizável.",
+      "id": "piteira-vidro-penguim-xl",
+      "name": "Piteira de Vidro PENGUIM XL",
+      "isActive": true,
+      "price": 70,
+      "category": "PITEIRAS_VIDRO"
+    },
+    {
       "price": 75,
-      "promoPrice": 45,
+      "description": "Dichavador premium formato de cubo oficial Lion Rolling Circus. 4 partes com tela coletora de kief e dentes de metal ultra resistentes.",
+      "isActive": true,
+      "id": "dichavador-cubo-lrc",
+      "name": "1 Und Dichavador Cubo LION ROLLING CIRCUS 4 partes",
       "category": "DICHAVADORES",
       "stock": 8,
-      "isActive": true,
+      "code": "DIC-001",
+      "promoPrice": 45,
       "featured": true
     },
     {
+      "stock": 15,
       "id": "dichavador-cubo-mystic",
-      "code": "DIC-002",
       "name": "1 Und Dichavador Cubo MYSTIC TIMBERS 4 partes",
-      "description": "Dichavador de alta durabilidade com design elegante Mystic Timbers. Ideal para triturar de forma homogênea.",
       "price": 50,
-      "category": "DICHAVADORES",
+      "isActive": true,
+      "code": "DIC-002",
       "variations": [
         {
           "name": "Acabamento",
@@ -105,16 +105,13 @@
           ]
         }
       ],
-      "stock": 15,
-      "isActive": true
+      "description": "Dichavador de alta durabilidade com design elegante Mystic Timbers. Ideal para triturar de forma homogênea.",
+      "category": "DICHAVADORES"
     },
     {
-      "id": "slick-divisor-squadafum",
-      "code": "SLI-001",
-      "name": "1 Und Slick Com Divisor SQUADAFUM 25ml",
-      "description": "Pote de silicone Squadafum de 25ml com divisória interna. Ideal para armazenar suas extrações com segurança, sem grudar e mantendo as propriedades.",
-      "price": 35,
       "category": "SLICKS",
+      "price": 35,
+      "isActive": true,
       "variations": [
         {
           "name": "Cor",
@@ -125,36 +122,39 @@
           ]
         }
       ],
+      "name": "1 Und Slick Com Divisor SQUADAFUM 25ml",
       "stock": 22,
-      "isActive": true
+      "code": "SLI-001",
+      "id": "slick-divisor-squadafum",
+      "description": "Pote de silicone Squadafum de 25ml com divisória interna. Ideal para armazenar suas extrações com segurança, sem grudar e mantendo as propriedades."
     },
     {
-      "id": "slick-lego-26ml",
-      "code": "SLI-002",
-      "name": "1 Und Slick LEGO 26ML",
-      "description": "Recipiente de silicone modular empilhável modelo bloco de Lego. Capacidade de 26ml para armazenamento seguro.",
-      "price": 24.99,
       "category": "SLICKS",
+      "name": "1 Und Slick LEGO 26ML",
+      "stock": 18,
+      "id": "slick-lego-26ml",
+      "isActive": true,
       "variations": [
         {
-          "name": "Cor",
           "options": [
             "Colorido",
             "Amarelo/Roxo",
             "Verde Neon"
-          ]
+          ],
+          "name": "Cor"
         }
       ],
-      "stock": 18,
-      "isActive": true
+      "description": "Recipiente de silicone modular empilhável modelo bloco de Lego. Capacidade de 26ml para armazenamento seguro.",
+      "price": 24.99,
+      "code": "SLI-002"
     },
     {
+      "stock": 14,
       "id": "cuia-banheira-silly-g",
-      "code": "CUI-001",
+      "category": "CUIAS",
       "name": "1 Und Cuia Banheira Silicone Bandeja SILLY TRAY - G",
       "description": "Cuia de silicone de tamanho Grande em formato de banheira Silly Tray. Espaço perfeito para picotar suas ervas sem desperdício.",
-      "price": 22.5,
-      "category": "CUIAS",
+      "isActive": true,
       "variations": [
         {
           "name": "Cor",
@@ -165,59 +165,59 @@
           ]
         }
       ],
-      "stock": 14,
-      "isActive": true
+      "price": 22.5,
+      "code": "CUI-001"
     },
     {
-      "id": "isqueiro-clipper",
-      "code": "ISQ-001",
-      "name": "1 Und Isqueiro CLIPER Recarregável",
       "description": "Isqueiro Clipper oficial, recarregável e com pedra trocável. Acessório indispensável com o famoso pilador embutido.",
       "price": 9,
+      "name": "1 Und Isqueiro CLIPER Recarregável",
+      "isActive": true,
+      "stock": 55,
+      "code": "ISQ-001",
       "category": "ISQUEIROS_MACARICOS",
+      "id": "isqueiro-clipper",
       "variations": [
         {
-          "name": "Estampa",
           "options": [
             "Psychedelic",
             "Classic Black",
             "Metal Gold",
             "Skull Art"
-          ]
+          ],
+          "name": "Estampa"
         }
-      ],
-      "stock": 55,
-      "isActive": true
+      ]
     },
     {
-      "id": "macarico-prof-recarregavel",
       "code": "ISQ-002",
-      "name": "1 Und Maçarico PROF Recarregável",
       "description": "Maçarico compacto profissional recarregável a gás butano. Chama potente com controle de intensidade e trava de segurança.",
+      "featured": true,
       "price": 27.5,
       "category": "ISQUEIROS_MACARICOS",
       "stock": 10,
       "isActive": true,
-      "featured": true
+      "name": "1 Und Maçarico PROF Recarregável",
+      "id": "macarico-prof-recarregavel"
     },
     {
       "id": "tesoura-metal-garca",
+      "isActive": true,
       "code": "TES-001",
-      "name": "1 Und Tesoura de Metal Garça",
-      "description": "Tesoura de metal cirúrgico com design clássico de garça. Ponta fina e afiação precisa, ideal para picotar com maestria.",
       "price": 35,
-      "promoPrice": 24.99,
       "category": "TESOURAS",
+      "promoPrice": 24.99,
+      "name": "1 Und Tesoura de Metal Garça",
       "stock": 6,
-      "isActive": true
+      "description": "Tesoura de metal cirúrgico com design clássico de garça. Ponta fina e afiação precisa, ideal para picotar com maestria."
     },
     {
-      "id": "anel-f1-sadhu",
-      "code": "HEA-001",
-      "name": "1 Und Anel F1 SADHU",
-      "description": "Anel de silicone Sadhu porta cigarro. Permite que você segure seu beck enquanto joga, digita ou dirige sem queimar os dedos.",
-      "price": 9.99,
       "category": "HEADSHOP",
+      "name": "1 Und Anel F1 SADHU",
+      "price": 9.99,
+      "description": "Anel de silicone Sadhu porta cigarro. Permite que você segure seu beck enquanto joga, digita ou dirige sem queimar os dedos.",
+      "id": "anel-f1-sadhu",
+      "isActive": true,
       "variations": [
         {
           "name": "Tamanho",
@@ -228,15 +228,10 @@
         }
       ],
       "stock": 30,
-      "isActive": true
+      "code": "HEA-001"
     },
     {
-      "id": "porta-beck-metal-bb",
-      "code": "HEA-002",
-      "name": "1 Und Porta Beck Metal BEM BOLADO G",
-      "description": "Mantenha seu beck seguro e à prova de água e odores. Tubo de metal de alta resistência Bem Bolado.",
       "price": 25,
-      "category": "HEADSHOP",
       "variations": [
         {
           "name": "Cor",
@@ -249,40 +244,45 @@
           ]
         }
       ],
+      "description": "Mantenha seu beck seguro e à prova de água e odores. Tubo de metal de alta resistência Bem Bolado.",
+      "name": "1 Und Porta Beck Metal BEM BOLADO G",
+      "code": "HEA-002",
       "stock": 25,
-      "isActive": true
+      "isActive": true,
+      "id": "porta-beck-metal-bb",
+      "category": "HEADSHOP"
     },
     {
-      "id": "tabaco-amsterdam",
       "code": "TAB-001",
-      "name": "1 Und Tabaco AMSTERDAM - 25g",
-      "description": "Tabaco Amsterdam extra suave, livre de aditivos químicos. Fios longos e fáceis de enrolar.",
-      "price": 22,
       "category": "TABACO_KUMBAYA",
+      "price": 22,
       "stock": 45,
-      "isActive": true
+      "id": "tabaco-amsterdam",
+      "name": "1 Und Tabaco AMSTERDAM - 25g",
+      "isActive": true,
+      "description": "Tabaco Amsterdam extra suave, livre de aditivos químicos. Fios longos e fáceis de enrolar."
     },
     {
-      "id": "kumbaya-tabaco-sasso",
-      "code": "TAB-002",
       "name": "Kumbaya com Tabaco SASSO - 25g",
       "description": "Blend especial de Kumbaya (ervas naturais) selecionadas harmonizado com o melhor tabaco suave Sasso.",
       "price": 20,
       "category": "TABACO_KUMBAYA",
       "stock": 15,
-      "isActive": true
+      "id": "kumbaya-tabaco-sasso",
+      "isActive": true,
+      "code": "TAB-002"
     }
   ],
   "categories": [
     {
-      "id": "KITS_COMPLETOS",
       "name": "KITS COMPLETOS",
-      "order": 1
+      "order": 1,
+      "id": "KITS_COMPLETOS"
     },
     {
       "id": "SEDA_BLUNTS",
-      "name": "SEDA/BLUNTS",
-      "order": 2
+      "order": 2,
+      "name": "SEDA/BLUNTS"
     },
     {
       "id": "PITEIRAS_VIDRO",
@@ -291,13 +291,13 @@
     },
     {
       "id": "DICHAVADORES",
-      "name": "DICHAVADORES",
-      "order": 4
+      "order": 4,
+      "name": "DICHAVADORES"
     },
     {
       "id": "PITEIRA_FILTRO",
-      "name": "PITEIRA/FILTRO",
-      "order": 5
+      "order": 5,
+      "name": "PITEIRA/FILTRO"
     },
     {
       "id": "SLICKS",
@@ -306,13 +306,13 @@
     },
     {
       "id": "CUIAS",
-      "name": "CUIAS",
-      "order": 7
+      "order": 7,
+      "name": "CUIAS"
     },
     {
-      "id": "ISQUEIROS_MACARICOS",
+      "order": 8,
       "name": "ISQUEIROS/MAÇARICOS",
-      "order": 8
+      "id": "ISQUEIROS_MACARICOS"
     },
     {
       "id": "TESOURAS",
@@ -321,54 +321,60 @@
     },
     {
       "id": "CUIAS_CERAMICA",
-      "name": "CUIAS DE CERÂMICA",
-      "order": 10
+      "order": 10,
+      "name": "CUIAS DE CERÂMICA"
     },
     {
+      "order": 11,
       "id": "HEADSHOP",
-      "name": "HEADSHOP",
-      "order": 11
+      "name": "HEADSHOP"
     },
     {
+      "order": 12,
       "id": "CASES",
-      "name": "CASES",
-      "order": 12
+      "name": "CASES"
     },
     {
-      "id": "BANDEJAS",
       "name": "BANDEJAS",
+      "id": "BANDEJAS",
       "order": 13
     },
     {
       "id": "BONGS_PIPES",
-      "name": "BONGS/PIPES",
-      "order": 14
+      "order": 14,
+      "name": "BONGS/PIPES"
     },
     {
-      "id": "TABACO_KUMBAYA",
       "name": "T4BAC0 0RG / KUMBAYA",
-      "order": 15
+      "order": 15,
+      "id": "TABACO_KUMBAYA"
     },
     {
       "id": "BOLADORES",
-      "name": "BOLADORES",
-      "order": 16
+      "order": 16,
+      "name": "BOLADORES"
     },
     {
       "id": "CINZEIROS",
-      "name": "CINZEIROS",
-      "order": 17
+      "order": 17,
+      "name": "CINZEIROS"
+    },
+    {
+      "name": "zz",
+      "order": 18,
+      "id": "ZZ"
     }
   ],
   "settings": {
-    "storeName": "TabasGestion",
-    "phone": "+5571981450503",
-    "instagram": "@tabasgestion",
-    "address": "Rua Doutor Augusto Lopes Pontes 455, Salvador - BA",
-    "deliveryFee": 10,
     "pickupTime": "24 horas",
-    "whatsappMessageTemplate": "Olá TabasGestion! Gostaria de fazer o seguinte pedido:"
+    "phone": "+55 71 9264-4345",
+    "whatsappMessageTemplate": "Olá TabasGestion! Gostaria de fazer o seguinte pedido:",
+    "deliveryFee": 10,
+    "instagram": "@tabasgestion",
+    "storeName": "TabasGestion",
+    "address": "Rua Doutor Augusto Lopes Pontes 455, Salvador - BA"
   },
   "passcode": "20132013",
-  "orders": []
+  "orders": [],
+  "updatedAt": "2026-11-05T22:40:04.823Z"
 }

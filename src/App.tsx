@@ -9,7 +9,7 @@ import { Product, Category, StoreSettings, Order } from './types';
 import CatalogView from './components/CatalogView';
 import PasscodeGate from './components/PasscodeGate';
 import AdminDashboard from './components/AdminDashboard';
-import { subscribeToStoreData } from './firebase';
+import { subscribeToStoreData, savePartialStoreToFirestore } from './firebase';
 
 export default function App() {
   const [products, setProducts] = useState<Product[]>(initialProducts);
@@ -86,11 +86,11 @@ export default function App() {
       });
   }, []);
 
-  // Handlers to synchronize with backend and update local React state
+  // Handlers to synchronize with backend and direct Firestore cloud
   const handleUpdateProducts = (newProducts: Product[]) => {
     setProducts(newProducts);
-    // Backwards compatibility with localStorage cache
     localStorage.setItem('tabas_products', JSON.stringify(newProducts));
+    savePartialStoreToFirestore({ products: newProducts });
     
     fetch('/api/db/products', {
       method: 'POST',
@@ -102,6 +102,7 @@ export default function App() {
   const handleUpdateCategories = (newCategories: Category[]) => {
     setCategories(newCategories);
     localStorage.setItem('tabas_categories', JSON.stringify(newCategories));
+    savePartialStoreToFirestore({ categories: newCategories });
 
     fetch('/api/db/categories', {
       method: 'POST',
@@ -113,6 +114,7 @@ export default function App() {
   const handleUpdateSettings = (newSettings: StoreSettings) => {
     setSettings(newSettings);
     localStorage.setItem('tabas_settings', JSON.stringify(newSettings));
+    savePartialStoreToFirestore({ settings: newSettings });
 
     fetch('/api/db/settings', {
       method: 'POST',
@@ -124,6 +126,7 @@ export default function App() {
   const handleUpdateOrders = (newOrders: Order[]) => {
     setOrders(newOrders);
     localStorage.setItem('tabasgestion_orders', JSON.stringify(newOrders));
+    savePartialStoreToFirestore({ orders: newOrders });
 
     fetch('/api/db/orders', {
       method: 'POST',
@@ -133,10 +136,12 @@ export default function App() {
   };
 
   const handleAddOrder = (newOrder: Order) => {
-    setOrders((prev) => [newOrder, ...prev]);
+    const updatedOrders = [newOrder, ...orders];
+    setOrders(updatedOrders);
     const savedOrdersStr = localStorage.getItem('tabasgestion_orders');
     const savedOrders = savedOrdersStr ? JSON.parse(savedOrdersStr) : [];
     localStorage.setItem('tabasgestion_orders', JSON.stringify([newOrder, ...savedOrders]));
+    savePartialStoreToFirestore({ orders: updatedOrders });
 
     fetch('/api/db/orders/add', {
       method: 'POST',
@@ -148,6 +153,7 @@ export default function App() {
   const handleUpdatePasscode = (newPasscode: string) => {
     setPasscode(newPasscode);
     localStorage.setItem('tabas_admin_passcode', newPasscode);
+    savePartialStoreToFirestore({ passcode: newPasscode });
 
     fetch('/api/db/passcode', {
       method: 'POST',

@@ -5,6 +5,7 @@ import { getFirestore, doc, getDoc, setDoc, Firestore as ClientFirestore } from 
 import fs from 'fs';
 import path from 'path';
 import { initialProducts, initialCategories, defaultSettings } from './src/data/mockProducts';
+import defaultAppletConfig from './firebase-applet-config.json';
 
 const DB_PATH = path.join(process.cwd(), 'src', 'data', 'db.json');
 const FIREBASE_CONFIG_PATH = path.join(process.cwd(), 'firebase-applet-config.json');
@@ -36,6 +37,9 @@ function getAppletFirestore(): ClientFirestore | null {
       try {
         config = JSON.parse(process.env.FIREBASE_CONFIG);
       } catch (e) {}
+    }
+    if (!config && defaultAppletConfig && (defaultAppletConfig as any).projectId) {
+      config = defaultAppletConfig;
     }
     if (!config && fs.existsSync(FIREBASE_CONFIG_PATH)) {
       const configRaw = fs.readFileSync(FIREBASE_CONFIG_PATH, 'utf-8');
@@ -393,7 +397,7 @@ export async function saveDatabase(db: any): Promise<boolean> {
  * Helper to get the current loaded or cached database
  */
 export async function getDatabaseSynced(): Promise<any> {
-  if (process.env.FIREBASE_CONFIG || fs.existsSync(FIREBASE_CONFIG_PATH) || process.env.FIREBASE_SERVICE_ACCOUNT || process.env.MONGODB_URI) {
+  if (process.env.FIREBASE_CONFIG || (defaultAppletConfig && (defaultAppletConfig as any).projectId) || fs.existsSync(FIREBASE_CONFIG_PATH) || process.env.FIREBASE_SERVICE_ACCOUNT || process.env.MONGODB_URI) {
     return loadDatabase();
   }
   if (memoryCache) {
@@ -406,7 +410,7 @@ export async function getDatabaseSynced(): Promise<any> {
  * Returns which database type is currently active
  */
 export function getActiveDatabaseType(): 'Firestore' | 'MongoDB' | 'Local' {
-  if (process.env.FIREBASE_CONFIG || fs.existsSync(FIREBASE_CONFIG_PATH) || process.env.FIREBASE_SERVICE_ACCOUNT) return 'Firestore';
+  if (process.env.FIREBASE_CONFIG || (defaultAppletConfig && (defaultAppletConfig as any).projectId) || fs.existsSync(FIREBASE_CONFIG_PATH) || process.env.FIREBASE_SERVICE_ACCOUNT) return 'Firestore';
   if (process.env.MONGODB_URI) return 'MongoDB';
   return 'Local';
 }
