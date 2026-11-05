@@ -154,7 +154,7 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
       clientName,
       clientPhone,
       deliveryType,
-      address: deliveryType === 'delivery' ? clientAddress : undefined,
+      address: deliveryType === 'delivery' ? clientAddress : '',
       items: cart.map(item => ({
         productId: item.product.id,
         productName: item.product.name,
@@ -163,12 +163,12 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
         selectedVariations: item.selectedVariations
       })),
       subtotal: cartSubtotal,
-      deliveryFee,
+      deliveryFee: deliveryFee || 0,
       total: cartTotal,
       paymentMethod: 'A combinar',
       status: 'pending',
       createdAt: new Date().toISOString(),
-      observation: orderObservation
+      observation: orderObservation || ''
     };
 
     // 2. Save Order to localStorage & Backend Server (so owner sees it in "Gestor")

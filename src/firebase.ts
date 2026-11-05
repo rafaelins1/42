@@ -36,11 +36,25 @@ export function subscribeToStoreData(onUpdate: (data: any) => void, onError?: (e
   );
 }
 
+function sanitizeForFirestore(obj: any): any {
+  if (obj === undefined) return null;
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(sanitizeForFirestore);
+  const clean: Record<string, any> = {};
+  for (const [key, val] of Object.entries(obj)) {
+    if (val !== undefined) {
+      clean[key] = sanitizeForFirestore(val);
+    }
+  }
+  return clean;
+}
+
 // Direct client-to-cloud Firestore save for instant multi-device sync
 export async function savePartialStoreToFirestore(fields: Record<string, any>): Promise<boolean> {
   try {
     const docRef = doc(db, 'tabas_store', 'main_store');
-    await setDoc(docRef, { ...fields, updatedAt: new Date().toISOString() }, { merge: true });
+    const sanitized = sanitizeForFirestore({ ...fields, updatedAt: new Date().toISOString() });
+    await setDoc(docRef, sanitized, { merge: true });
     return true;
   } catch (err) {
     console.error('Failed to save to Firestore directly:', err);
