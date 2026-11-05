@@ -1,5 +1,3 @@
-import { MongoClient, Db } from 'mongodb';
-import { Firestore } from '@google-cloud/firestore';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore, doc, getDoc, setDoc, Firestore as ClientFirestore } from 'firebase/firestore';
 import fs from 'fs';
@@ -60,8 +58,8 @@ function getAppletFirestore(): ClientFirestore | null {
 // ------------------
 // MongoDB Provider (Lazy Initialized)
 // ------------------
-let mongoClient: MongoClient | null = null;
-let mongoDb: Db | null = null;
+let mongoClient: any = null;
+let mongoDb: any = null;
 let lastConnectionError: string | null = null;
 let connectedUri: string | null = null;
 
@@ -153,6 +151,7 @@ async function getMongoClient() {
   const cleanedUri = cleanMongoUri(uri);
 
   try {
+    const { MongoClient } = await import('mongodb');
     mongoClient = new MongoClient(cleanedUri, {
       connectTimeoutMS: 4000,
       socketTimeoutMS: 4000,
@@ -185,14 +184,15 @@ async function getMongoClient() {
 // ------------------
 // Service Account Firestore Provider (Fallback if provided)
 // ------------------
-let serviceAccountFirestore: Firestore | null = null;
+let serviceAccountFirestore: any = null;
 
-function getServiceAccountFirestore() {
+async function getServiceAccountFirestore() {
   const serviceAccountStr = process.env.FIREBASE_SERVICE_ACCOUNT;
   if (!serviceAccountStr) return null;
   if (serviceAccountFirestore) return serviceAccountFirestore;
 
   try {
+    const { Firestore } = await import('@google-cloud/firestore');
     const serviceAccount = JSON.parse(serviceAccountStr);
     if (serviceAccount.private_key) {
       serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
@@ -256,7 +256,7 @@ export async function loadDatabase(): Promise<any> {
   // 2. Secondary: Firestore via Service Account
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     try {
-      const db = getServiceAccountFirestore();
+      const db = await getServiceAccountFirestore();
       if (db) {
         const docRef = db.collection('tabas_store').doc('main_store');
         const docSnap = await docRef.get();
@@ -350,7 +350,7 @@ export async function saveDatabase(db: any): Promise<boolean> {
   // 2. Secondary: Firestore Service Account
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     try {
-      const client = getServiceAccountFirestore();
+      const client = await getServiceAccountFirestore();
       if (client) {
         const docRef = client.collection('tabas_store').doc('main_store');
         await docRef.set(db, { merge: true });

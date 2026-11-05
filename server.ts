@@ -15,7 +15,7 @@ const PORT = 3000;
 app.use(express.json({ limit: '10mb' }));
 
 // API Endpoints
-app.get('/api/db', async (req, res) => {
+app.get(['/api/db', '/api', '/api/server/db'], async (req, res) => {
   try {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     const db = await getDatabaseSynced();
@@ -123,7 +123,7 @@ app.post('/api/db/orders/add', async (req, res) => {
 });
 
 // Sync Status API endpoints
-app.get('/api/db/sync-status', async (req, res) => {
+app.get(['/api/db/sync-status', '/api/sync-status', '/api/server'], async (req, res) => {
   try {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     const activeType = getActiveDatabaseType();

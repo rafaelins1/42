@@ -9,7 +9,7 @@ import { Product, Category, StoreSettings, Order } from './types';
 import CatalogView from './components/CatalogView';
 import PasscodeGate from './components/PasscodeGate';
 import AdminDashboard from './components/AdminDashboard';
-import { subscribeToStoreData, savePartialStoreToFirestore } from './firebase';
+import { subscribeToStoreData, savePartialStoreToFirestore, getStoreDataFromFirestore } from './firebase';
 
 export default function App() {
   const [products, setProducts] = useState<Product[]>(initialProducts);
@@ -42,29 +42,42 @@ export default function App() {
     };
   }, []);
 
-  // Load database from full-stack server
+  // Load database from cloud Firestore or server API
   useEffect(() => {
-    fetch(`/api/db?t=${Date.now()}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('API response was not ok');
-        return res.json();
-      })
-      .then((data) => {
-        if (data) {
-          if (data.products) setProducts(data.products);
-          if (data.categories) setCategories(data.categories);
-          if (data.settings) setSettings(data.settings);
-          if (data.orders) setOrders(data.orders);
-          if (data.passcode && data.passcode.length === 8) {
-            setPasscode(data.passcode);
-          } else {
-            setPasscode('20132013');
+    getStoreDataFromFirestore()
+      .then((cloudData) => {
+        if (cloudData) {
+          if (Array.isArray(cloudData.products)) setProducts(cloudData.products);
+          if (Array.isArray(cloudData.categories)) setCategories(cloudData.categories);
+          if (cloudData.settings && typeof cloudData.settings === 'object') setSettings(cloudData.settings);
+          if (Array.isArray(cloudData.orders)) setOrders(cloudData.orders);
+          if (cloudData.passcode && typeof cloudData.passcode === 'string' && cloudData.passcode.length === 8) {
+            setPasscode(cloudData.passcode);
           }
+          setIsLoading(false);
+          return;
         }
-        setIsLoading(false);
+
+        return fetch(`/api/db?t=${Date.now()}`)
+          .then((res) => {
+            if (!res.ok) throw new Error('API response was not ok');
+            return res.json();
+          })
+          .then((data) => {
+            if (data) {
+              if (data.products) setProducts(data.products);
+              if (data.categories) setCategories(data.categories);
+              if (data.settings) setSettings(data.settings);
+              if (data.orders) setOrders(data.orders);
+              if (data.passcode && data.passcode.length === 8) {
+                setPasscode(data.passcode);
+              }
+            }
+            setIsLoading(false);
+          });
       })
       .catch((err) => {
-        console.error('Failed to load database from server:', err);
+        console.warn('Network fallback:', err);
         const savedProducts = localStorage.getItem('tabas_products');
         const savedCategories = localStorage.getItem('tabas_categories');
         const savedSettings = localStorage.getItem('tabas_settings');
@@ -75,13 +88,9 @@ export default function App() {
         if (savedCategories) setCategories(JSON.parse(savedCategories));
         if (savedSettings) setSettings(JSON.parse(savedSettings));
         if (savedOrders) setOrders(JSON.parse(savedOrders));
-        
         if (savedPasscode && savedPasscode.length === 8) {
           setPasscode(savedPasscode);
-        } else {
-          setPasscode('20132013');
         }
-        
         setIsLoading(false);
       });
   }, []);

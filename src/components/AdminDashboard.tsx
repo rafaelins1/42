@@ -13,6 +13,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, Category, StoreSettings, Order, OrderStatus } from '../types';
 import DomainCostsGuide from './DomainCostsGuide';
+import { validateFirestoreConnection, savePartialStoreToFirestore, getStoreDataFromFirestore } from '../firebase';
 
 interface AdminDashboardProps {
   products: Product[];
@@ -132,15 +133,29 @@ export default function AdminDashboard({
         return res.json();
       })
       .then(data => setSyncStatus(data))
-      .catch(err => {
-        console.error('Failed to get cloud sync status:', err);
+      .catch(async () => {
+        try {
+          const isConnected = await validateFirestoreConnection();
+          if (isConnected) {
+            setSyncStatus({
+              enabled: true,
+              lastSynced: new Date().toISOString(),
+              cloudUrl: 'Google Cloud Firestore',
+              bucketId: 'Firestore',
+              connectionError: null,
+              message: 'Conectado diretamente ao Google Cloud Firestore em nuvem! Todos os dados e alterações estão persistidos e sincronizados na web.'
+            });
+            return;
+          }
+        } catch (e) {}
+
         setSyncStatus({
           enabled: false,
           lastSynced: null,
           cloudUrl: 'Servidor',
           bucketId: 'Offline',
           isNetworkError: true,
-          connectionError: `O servidor está reiniciando ou indisponível temporariamente. Por favor, aguarde alguns segundos e clique em "Tentar Novamente". (${err.message || err})`
+          connectionError: 'O servidor está reiniciando ou indisponível temporariamente. Por favor, aguarde alguns segundos e clique em "Tentar Novamente".'
         });
       });
   };
@@ -168,8 +183,25 @@ export default function AdminDashboard({
       });
   };
 
-  const handleForcePush = () => {
+  const handleForcePush = async () => {
     setIsSyncing(true);
+    try {
+      const success = await savePartialStoreToFirestore({
+        products,
+        categories,
+        settings,
+        orders,
+        passcode
+      });
+      if (success) {
+        fetchSyncStatus();
+        setSyncMessage({ text: 'Sincronização concluída com sucesso! Todos os dados locais estão salvos na nuvem.', error: false });
+        setTimeout(() => setSyncMessage(null), 5000);
+        setIsSyncing(false);
+        return;
+      }
+    } catch (e) {}
+
     fetch('/api/db/sync/force-push', { method: 'POST' })
       .then(res => res.json())
       .then(data => {
@@ -188,9 +220,26 @@ export default function AdminDashboard({
       });
   };
 
-  const handleForcePull = () => {
+  const handleForcePull = async () => {
     if (!confirm('Isso irá substituir TODOS os dados do catálogo e pedidos deste aparelho com os dados salvos na nuvem. Deseja continuar?')) return;
     setIsSyncing(true);
+    try {
+      const cloudDb = await getStoreDataFromFirestore();
+      if (cloudDb) {
+        setIsSyncing(false);
+        fetchSyncStatus();
+        if (cloudDb.products) onUpdateProducts(cloudDb.products);
+        if (cloudDb.categories) onUpdateCategories(cloudDb.categories);
+        if (cloudDb.settings) onUpdateSettings(cloudDb.settings);
+        if (cloudDb.orders) onUpdateOrders(cloudDb.orders);
+        if (cloudDb.passcode) onUpdatePasscode(cloudDb.passcode);
+
+        setSyncMessage({ text: 'Dados restaurados da nuvem com sucesso neste aparelho!', error: false });
+        setTimeout(() => setSyncMessage(null), 5000);
+        return;
+      }
+    } catch (e) {}
+
     fetch('/api/db/sync/force-pull', { method: 'POST' })
       .then(res => {
         if (!res.ok) throw new Error();
