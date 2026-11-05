@@ -288,8 +288,56 @@ export default function AdminDashboard({
     };
   }, [products, orders]);
 
-  // Order status management
+  // Order status management with automatic stock deduction
   const handleUpdateOrderStatus = (orderId: string, newStatus: OrderStatus) => {
+    const targetOrder = orders.find(o => o.id === orderId);
+    if (!targetOrder) return;
+
+    const oldStatus = targetOrder.status;
+    let updatedProducts = [...products];
+    let stockChanged = false;
+
+    // Baixa automática no estoque ao marcar como "Entregue" (completed)
+    if (newStatus === 'completed' && oldStatus !== 'completed') {
+      targetOrder.items.forEach(item => {
+        const prodIndex = updatedProducts.findIndex(p => p.id === item.productId);
+        if (prodIndex !== -1) {
+          const currentStock = Number(updatedProducts[prodIndex].stock) || 0;
+          updatedProducts[prodIndex] = {
+            ...updatedProducts[prodIndex],
+            stock: Math.max(0, currentStock - item.quantity)
+          };
+          stockChanged = true;
+        }
+      });
+
+      if (stockChanged) {
+        onUpdateProducts(updatedProducts);
+        setSyncMessage({ text: 'Pedido Entregue! Quantidades debitadas do estoque automaticamente.', error: false });
+        setTimeout(() => setSyncMessage(null), 4000);
+      }
+    }
+    // Devolução automática ao estoque se um pedido Entregue for cancelado ou reaberto
+    else if (oldStatus === 'completed' && (newStatus === 'canceled' || newStatus === 'pending')) {
+      targetOrder.items.forEach(item => {
+        const prodIndex = updatedProducts.findIndex(p => p.id === item.productId);
+        if (prodIndex !== -1) {
+          const currentStock = Number(updatedProducts[prodIndex].stock) || 0;
+          updatedProducts[prodIndex] = {
+            ...updatedProducts[prodIndex],
+            stock: currentStock + item.quantity
+          };
+          stockChanged = true;
+        }
+      });
+
+      if (stockChanged) {
+        onUpdateProducts(updatedProducts);
+        setSyncMessage({ text: 'Pedido cancelado/reaberto. Quantidades estornadas ao estoque.', error: false });
+        setTimeout(() => setSyncMessage(null), 4000);
+      }
+    }
+
     const updatedOrders = orders.map(o => {
       if (o.id === orderId) {
         return { ...o, status: newStatus };
