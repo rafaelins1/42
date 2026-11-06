@@ -7,12 +7,11 @@ import React, { useState, useMemo } from 'react';
 import { 
   LayoutDashboard, Package, Layers, Settings, LogOut, Plus, 
   Trash2, Edit, Check, X, RefreshCw, AlertTriangle, MessageSquare, 
-  DollarSign, TrendingUp, CheckCircle2, BadgePercent, BookOpen, User, MapPin,
+  DollarSign, TrendingUp, CheckCircle2, BadgePercent, User, MapPin,
   Shield, Database
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, Category, StoreSettings, Order, OrderStatus } from '../types';
-import DomainCostsGuide from './DomainCostsGuide';
 import { validateFirestoreConnection, savePartialStoreToFirestore, getStoreDataFromFirestore } from '../firebase';
 
 interface AdminDashboardProps {
@@ -44,7 +43,7 @@ export default function AdminDashboard({
 }: AdminDashboardProps) {
   
   // Navigation tabs
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'orders' | 'products' | 'categories' | 'settings' | 'guide'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'orders' | 'products' | 'categories' | 'settings'>('dashboard');
 
   const reloadOrders = () => {
     fetch('/api/db')
@@ -619,18 +618,6 @@ export default function AdminDashboard({
             >
               <Settings className="w-4 h-4" />
               <span>Configurações</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('guide')}
-              className={`flex items-center gap-2.5 py-2 px-3.5 rounded-lg text-xs font-semibold transition-all shrink-0 w-max lg:w-full border border-transparent ${
-                activeTab === 'guide'
-                  ? 'bg-purple-500 text-neutral-950 border-purple-500 shadow'
-                  : 'text-neutral-400 hover:text-white hover:bg-neutral-900 border-dashed border-purple-500/30'
-              }`}
-              id="tab-btn-guide"
-            >
-              <BookOpen className="w-4 h-4" />
-              <span>Custos / Deploy</span>
             </button>
           </nav>
         </aside>
@@ -1414,12 +1401,6 @@ export default function AdminDashboard({
             </div>
           )}
 
-          {/* TAB 6: GUIA DE CUSTOS E DEPLOY */}
-          {activeTab === 'guide' && (
-            <div className="space-y-4 animate-fadeIn">
-              <DomainCostsGuide />
-            </div>
-          )}
 
         </main>
       </div>
