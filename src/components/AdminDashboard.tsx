@@ -8,11 +8,12 @@ import {
   LayoutDashboard, Package, Layers, Settings, LogOut, Plus, 
   Trash2, Edit, Check, X, RefreshCw, AlertTriangle, MessageSquare, 
   DollarSign, TrendingUp, CheckCircle2, BadgePercent, User, MapPin,
-  Shield, Database
+  Shield, Database, Image as ImageIcon, Upload, Camera
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, Category, StoreSettings, Order, OrderStatus } from '../types';
 import { validateFirestoreConnection, savePartialStoreToFirestore, getStoreDataFromFirestore } from '../firebase';
+import { compressImage } from '../utils/imageUtils';
 
 interface AdminDashboardProps {
   products: Product[];
@@ -71,17 +72,61 @@ export default function AdminDashboard({
   const [prodIsActive, setProdIsActive] = useState(true);
   const [prodFeatured, setProdFeatured] = useState(false);
   const [prodVariationsText, setProdVariationsText] = useState(''); // comma separated choices for quick input: e.g. "Cor: Azul, Preto, Rosa"
+  const [prodImage, setProdImage] = useState('');
+  const [isUploadingProdImage, setIsUploadingProdImage] = useState(false);
 
   // Category Form State
   const [newCatName, setNewCatName] = useState('');
 
   // Settings Form State
   const [setStoreName, setSetStoreName] = useState(settings.storeName);
+  const [setLogoUrl, setSetLogoUrl] = useState(settings.logoUrl || '');
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [setPhone, setSetPhone] = useState(settings.phone);
   const [setInstagram, setSetInstagram] = useState(settings.instagram);
   const [setAddress, setSetAddress] = useState(settings.address);
   const [setDeliveryFee, setSetDeliveryFee] = useState(String(settings.deliveryFee));
   const [setPickupTime, setSetPickupTime] = useState(settings.pickupTime);
+
+  React.useEffect(() => {
+    setSetStoreName(settings.storeName);
+    setSetLogoUrl(settings.logoUrl || '');
+    setSetPhone(settings.phone);
+    setSetInstagram(settings.instagram);
+    setSetAddress(settings.address);
+    setSetDeliveryFee(String(settings.deliveryFee));
+    setSetPickupTime(settings.pickupTime);
+  }, [settings]);
+
+  const handleProductImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setIsUploadingProdImage(true);
+      const compressed = await compressImage(file, 800, 800, 0.82);
+      setProdImage(compressed);
+    } catch (err: any) {
+      alert(err.message || 'Erro ao carregar foto do produto.');
+    } finally {
+      setIsUploadingProdImage(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setIsUploadingLogo(true);
+      const compressed = await compressImage(file, 400, 400, 0.85);
+      setSetLogoUrl(compressed);
+    } catch (err: any) {
+      alert(err.message || 'Erro ao carregar logotipo.');
+    } finally {
+      setIsUploadingLogo(false);
+      e.target.value = '';
+    }
+  };
 
   // PIN Admin Form State
   const [currentPIN, setCurrentPIN] = useState(passcode);
@@ -366,6 +411,7 @@ export default function AdminDashboard({
     setProdIsActive(true);
     setProdFeatured(false);
     setProdVariationsText('');
+    setProdImage('');
     setIsProductModalOpen(true);
   };
 
@@ -380,6 +426,7 @@ export default function AdminDashboard({
     setProdStock(String(p.stock));
     setProdIsActive(p.isActive);
     setProdFeatured(p.featured ?? false);
+    setProdImage(p.image ?? '');
     
     // Format variations text back for easy edit
     if (p.variations && p.variations.length > 0) {
@@ -435,6 +482,7 @@ export default function AdminDashboard({
             code: prodCode.trim() || undefined,
             name: prodName.trim(),
             description: prodDescription.trim(),
+            image: prodImage.trim() || undefined,
             price: priceNum,
             promoPrice: promoPriceNum,
             category: prodCategory,
@@ -454,6 +502,7 @@ export default function AdminDashboard({
         code: prodCode.trim() || undefined,
         name: prodName.trim(),
         description: prodDescription.trim(),
+        image: prodImage.trim() || undefined,
         price: priceNum,
         promoPrice: promoPriceNum,
         category: prodCategory,
@@ -507,6 +556,7 @@ export default function AdminDashboard({
     e.preventDefault();
     onUpdateSettings({
       storeName: setStoreName,
+      logoUrl: setLogoUrl.trim() || undefined,
       phone: setPhone,
       instagram: setInstagram,
       address: setAddress,
@@ -524,8 +574,12 @@ export default function AdminDashboard({
       <header className="sticky top-0 z-40 bg-neutral-900 border-b border-neutral-850 px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-purple-500 flex items-center justify-center font-bold text-neutral-950 text-sm">
-              G
+            <div className="h-8 w-8 rounded-lg bg-purple-500 flex items-center justify-center font-bold text-neutral-950 text-sm overflow-hidden shrink-0">
+              {settings.logoUrl ? (
+                <img src={settings.logoUrl} alt={settings.storeName} className="w-full h-full object-cover" />
+              ) : (
+                'G'
+              )}
             </div>
             <div>
               <span className="text-sm font-extrabold tracking-tight text-white block">TabasGestion Painel</span>
@@ -932,6 +986,7 @@ export default function AdminDashboard({
                 <table className="w-full text-xs text-left" id="products-admin-table">
                   <thead className="text-[10px] uppercase font-bold tracking-wider text-neutral-500 border-b border-neutral-800">
                     <tr>
+                      <th className="py-3 px-4">Foto</th>
                       <th className="py-3 px-4">Cód / Nome</th>
                       <th className="py-3 px-4">Categoria</th>
                       <th className="py-3 px-4">Preço (R$)</th>
@@ -944,6 +999,22 @@ export default function AdminDashboard({
                     {products.map((p) => {
                       return (
                         <tr key={p.id} className="hover:bg-neutral-950/40 transition-colors">
+                          <td className="py-2.5 px-4 w-14">
+                            <div className="w-11 h-11 rounded-lg bg-neutral-900 border border-neutral-800 overflow-hidden flex items-center justify-center shrink-0">
+                              {p.image ? (
+                                <img
+                                  src={p.image}
+                                  alt={p.name}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLElement).style.display = 'none';
+                                  }}
+                                />
+                              ) : (
+                                <span className="text-base text-neutral-600">🍁</span>
+                              )}
+                            </div>
+                          </td>
                           <td className="py-3.5 px-4 max-w-[200px]">
                             <div className="font-semibold text-white truncate">{p.name}</div>
                             {p.code ? (
@@ -1090,6 +1161,81 @@ export default function AdminDashboard({
 
               <form onSubmit={handleSaveSettings} className="space-y-5 max-w-xl">
                 
+                {/* Store Logo Section */}
+                <div className="p-4 bg-neutral-950 rounded-xl border border-neutral-850 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                      <ImageIcon className="w-4 h-4 text-purple-500" />
+                      <span>Logotipo da Loja (Logo)</span>
+                    </label>
+                    {setLogoUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setSetLogoUrl('')}
+                        className="text-[11px] text-red-400 hover:text-red-300 flex items-center gap-1 font-medium transition-colors"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        Remover Logo
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                    {/* Logo Preview */}
+                    <div className="w-16 h-16 rounded-xl bg-neutral-900 border border-neutral-800 overflow-hidden shrink-0 flex items-center justify-center relative shadow-lg">
+                      {setLogoUrl ? (
+                        <img
+                          src={setLogoUrl}
+                          alt="Logo Preview"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-purple-500 flex items-center justify-center font-black text-neutral-950 text-xl tracking-wider">
+                          TG
+                        </div>
+                      )}
+                      {isUploadingLogo && (
+                        <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+                          <RefreshCw className="w-5 h-5 text-purple-500 animate-spin" />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-1 space-y-2 w-full">
+                      <div className="flex flex-wrap gap-2 items-center">
+                        <label className="cursor-pointer px-3.5 py-2 bg-purple-500 hover:bg-purple-400 text-neutral-950 font-bold rounded-lg text-xs flex items-center gap-1.5 transition-all shadow active:scale-95">
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>{setLogoUrl ? 'Trocar Logo (Arquivo)' : 'Escolher Logo do Aparelho'}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleLogoUpload}
+                          />
+                        </label>
+                        <span className="text-[11px] text-neutral-500">ou cole link</span>
+                      </div>
+
+                      <div className="space-y-1">
+                        <input
+                          type="url"
+                          placeholder="Cole a URL da imagem da Logo (Ex: https://...)"
+                          value={setLogoUrl}
+                          onChange={(e) => setSetLogoUrl(e.target.value)}
+                          className="w-full bg-neutral-900 border border-neutral-800 text-white rounded-lg py-2 px-3 text-xs focus:outline-none focus:border-purple-500 transition-colors font-mono"
+                          id="settings-logourl"
+                        />
+                        <p className="text-[10px] text-neutral-500">
+                          O logotipo aparece no cabeçalho do catálogo, na área do cliente e no painel de gestão.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-xs text-neutral-400 block font-semibold">Nome da Loja</label>
@@ -1432,6 +1578,83 @@ export default function AdminDashboard({
 
                 <form onSubmit={handleSaveProduct} className="space-y-4 text-xs">
                   
+                  {/* Product Image Section */}
+                  <div className="p-3.5 bg-neutral-950 rounded-xl border border-neutral-850 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold text-neutral-300 flex items-center gap-1.5">
+                        <ImageIcon className="w-4 h-4 text-purple-500" />
+                        <span>Foto do Produto</span>
+                      </label>
+                      {prodImage && (
+                        <button
+                          type="button"
+                          onClick={() => setProdImage('')}
+                          className="text-[11px] text-red-400 hover:text-red-300 flex items-center gap-1 font-medium transition-colors"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          Remover Foto
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                      {/* Image Preview Box */}
+                      <div className="w-20 h-20 rounded-xl bg-neutral-900 border border-neutral-800 overflow-hidden shrink-0 flex items-center justify-center relative group">
+                        {prodImage ? (
+                          <img
+                            src={prodImage}
+                            alt="Preview do Produto"
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center justify-center text-neutral-600 gap-1 p-2 text-center">
+                            <Camera className="w-5 h-5 text-neutral-600" />
+                            <span className="text-[9px] leading-tight font-medium">Sem Foto</span>
+                          </div>
+                        )}
+                        {isUploadingProdImage && (
+                          <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+                            <RefreshCw className="w-5 h-5 text-purple-500 animate-spin" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Controls */}
+                      <div className="flex-1 space-y-2 w-full">
+                        <div className="flex flex-wrap gap-2 items-center">
+                          <label className="cursor-pointer px-3 py-1.5 bg-purple-500 hover:bg-purple-400 text-neutral-950 font-bold rounded-lg text-xs flex items-center gap-1.5 transition-all shadow active:scale-95">
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>{prodImage ? 'Trocar Foto do Aparelho' : 'Escolher Foto do Aparelho'}</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={handleProductImageUpload}
+                            />
+                          </label>
+                          <span className="text-[11px] text-neutral-500">ou cole link</span>
+                        </div>
+
+                        <div className="space-y-1">
+                          <input
+                            type="url"
+                            placeholder="Cole o link da imagem (Ex: https://...)"
+                            value={prodImage}
+                            onChange={(e) => setProdImage(e.target.value)}
+                            className="w-full bg-neutral-900 border border-neutral-800 text-white rounded-lg py-2 px-3 text-xs focus:outline-none focus:border-purple-500 transition-colors font-mono"
+                            id="form-product-image"
+                          />
+                          <p className="text-[10px] text-neutral-500">
+                            Carregue uma foto da câmera/galeria ou cole uma URL direta da internet.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Grid fields */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">

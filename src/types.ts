@@ -72,4 +72,6 @@ export interface StoreSettings {
   deliveryFee: number;
   pickupTime: string;
   whatsappMessageTemplate: string;
+  logoUrl?: string;
+  bannerUrl?: string;
 }

@@ -241,11 +241,19 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
       <header className="sticky top-0 z-40 bg-neutral-900/95 backdrop-blur border-b border-neutral-800/80 px-4 py-3.5 shadow-lg">
         <div className="max-w-full w-full flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-purple-500 flex items-center justify-center font-black text-neutral-950 text-lg tracking-wider shadow-lg shadow-purple-500/20">
-              TG
-            </div>
+            {settings.logoUrl ? (
+              <img
+                src={settings.logoUrl}
+                alt={settings.storeName}
+                className="h-10 w-10 rounded-xl object-cover shadow-lg border border-neutral-800 shrink-0"
+              />
+            ) : (
+              <div className="h-10 w-10 rounded-xl bg-purple-500 flex items-center justify-center font-black text-neutral-950 text-lg tracking-wider shadow-lg shadow-purple-500/20 shrink-0">
+                TG
+              </div>
+            )}
             <div>
-              <span className="text-lg font-bold tracking-tight text-white block">TabasGestion</span>
+              <span className="text-lg font-bold tracking-tight text-white block">{settings.storeName || 'TabasGestion'}</span>
               <span className="text-xs text-neutral-400 flex items-center gap-1 font-mono">
                 <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
                 Catálogo Online
@@ -295,9 +303,18 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
               <Sparkles className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '6s' }} />
               Premium Smoke Shop & Headshop
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-2">
-              TabasGestion
-            </h1>
+            <div className="flex items-center gap-4 mb-2">
+              {settings.logoUrl && (
+                <img
+                  src={settings.logoUrl}
+                  alt={settings.storeName}
+                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border border-purple-500/30 shadow-xl shadow-purple-500/10 shrink-0"
+                />
+              )}
+              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+                {settings.storeName || 'TabasGestion'}
+              </h1>
+            </div>
             <p className="text-neutral-400 text-sm sm:text-base leading-relaxed max-w-3xl">
               O catálogo mais completo de sedas, cases, kits, dichavadores e acessórios. Monte seu carrinho e envie seu pedido diretamente no nosso WhatsApp.
             </p>
@@ -552,17 +569,29 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                         {/* Image Container with blurred background like Kyte app */}
                         <div 
                           onClick={() => handleOpenProductDetail(product)}
-                          className="h-28 sm:h-36 bg-neutral-950 relative overflow-hidden flex items-center justify-center cursor-pointer border-b border-neutral-800/40"
+                          className="h-32 sm:h-40 bg-neutral-950 relative overflow-hidden flex items-center justify-center cursor-pointer border-b border-neutral-800/40 group"
                         >
-                          {/* Image styling - clean vector mock if no image */}
-                          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-neutral-950/20" />
-                          <div className="w-16 h-16 rounded-full bg-neutral-900 flex items-center justify-center border border-neutral-800/80 group-hover:scale-110 transition-transform">
-                            <span className="text-2xl">🍁</span>
-                          </div>
+                          {product.image ? (
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <>
+                              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-neutral-950/20" />
+                              <div className="w-16 h-16 rounded-full bg-neutral-900 flex items-center justify-center border border-neutral-800/80 group-hover:scale-110 transition-transform">
+                                <span className="text-2xl">🍁</span>
+                              </div>
+                            </>
+                          )}
                           
                           {/* Code tooltip if any */}
                           {product.code && (
-                            <span className="absolute bottom-2 left-2 text-[10px] bg-neutral-900/80 backdrop-blur text-neutral-400 font-mono py-0.5 px-1.5 rounded">
+                            <span className="absolute bottom-2 left-2 text-[10px] bg-neutral-900/90 backdrop-blur text-neutral-300 font-mono py-0.5 px-1.5 rounded border border-neutral-800/60 z-10">
                               {product.code}
                             </span>
                           )}
@@ -630,9 +659,20 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                           onClick={() => handleOpenProductDetail(product)}
                           className="w-20 h-20 bg-neutral-950 rounded-lg overflow-hidden shrink-0 flex items-center justify-center cursor-pointer relative border border-neutral-800/40"
                         >
-                          <span className="text-xl">🍂</span>
+                          {product.image ? (
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <span className="text-xl">🍂</span>
+                          )}
                           {hasPromo && (
-                            <span className="absolute top-1 left-1 bg-purple-500 text-neutral-950 text-[8px] font-bold py-0.5 px-1 rounded">
+                            <span className="absolute top-1 left-1 bg-purple-500 text-neutral-950 text-[8px] font-bold py-0.5 px-1 rounded z-10">
                               PROMO
                             </span>
                           )}
@@ -737,9 +777,17 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
               {/* Product Info */}
               <div className="p-6 space-y-6">
                 
-                {/* Modal Visual Placeholder */}
-                <div className="h-56 bg-neutral-950 rounded-xl flex items-center justify-center relative border border-neutral-800">
-                  <span className="text-5xl">🌿</span>
+                {/* Modal Visual Placeholder / Real Image */}
+                <div className="h-60 sm:h-72 bg-neutral-950 rounded-xl flex items-center justify-center relative border border-neutral-800 overflow-hidden">
+                  {selectedProduct.image ? (
+                    <img
+                      src={selectedProduct.image}
+                      alt={selectedProduct.name}
+                      className="w-full h-full object-contain bg-black/40"
+                    />
+                  ) : (
+                    <span className="text-5xl">🌿</span>
+                  )}
                   {selectedProduct.promoPrice && (
                     <span className="absolute top-3 left-3 bg-purple-500 text-neutral-950 text-xs font-black py-1 px-2.5 rounded-md shadow-md">
                       OFERTA ESPECIAL
@@ -903,8 +951,12 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                       const itemPrice = item.product.promoPrice ?? item.product.price;
                       return (
                         <div key={idx} className="bg-neutral-950/80 border border-neutral-800 rounded-xl p-3 flex gap-3 relative">
-                          <div className="w-12 h-12 bg-neutral-900 rounded-lg flex items-center justify-center text-xl border border-neutral-800">
-                            🍂
+                          <div className="w-12 h-12 bg-neutral-900 rounded-lg flex items-center justify-center text-xl border border-neutral-800 overflow-hidden shrink-0">
+                            {item.product.image ? (
+                              <img src={item.product.image} alt={item.product.name} className="w-full h-full object-cover" />
+                            ) : (
+                              '🍂'
+                            )}
                           </div>
                           
                           <div className="flex-1 min-w-0 pr-6">
