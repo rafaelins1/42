@@ -74,4 +74,5 @@ export interface StoreSettings {
   whatsappMessageTemplate: string;
   logoUrl?: string;
   bannerUrl?: string;
+  vipGroupUrl?: string;
 }

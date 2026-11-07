@@ -7,7 +7,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import { 
   Search, Grid, List, ShoppingCart, MapPin, Instagram, Phone, 
   Clock, ChevronRight, Plus, Minus, Trash2, X, Send, Sparkles, 
-  Lock, ArrowRight, Eye, ShieldAlert, BadgePercent
+  Lock, ArrowRight, Eye, ShieldAlert, BadgePercent, Crown, MessageCircle, ExternalLink
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, Category, CartItem, SelectedVariation, StoreSettings, Order } from '../types';
@@ -39,6 +39,8 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
   const [orderObservation, setOrderObservation] = useState('');
 
   const categoriesContainerRef = useRef<HTMLDivElement>(null);
+
+  const vipUrl = settings.vipGroupUrl || 'https://chat.whatsapp.com/I38enKB1mtzKN1yxNLuzZV?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAcGRvZgJzcnRjBmFwcF9pZA85MzY2MTk3NDMzOTI0NTkAAaeANudPlmE3P-wSV0SRjpLfqMxg0w6ekmZEKRuQugpoWQ0JM7UbEsDlCgflcw_aem_9aoKn118zHWAejZ0Bi4wrA';
 
   // Filtered products
   const filteredProducts = useMemo(() => {
@@ -261,7 +263,20 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* VIP Group Trigger */}
+            <a
+              href={vipUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs font-bold py-1.5 px-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 transition-all shadow-sm"
+              title="Acessar Grupo VIP no WhatsApp"
+              id="btn-header-vip"
+            >
+              <Crown className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+              <span className="hidden sm:inline">Grupo VIP</span>
+            </a>
+
             {/* Go to Manager Button */}
             <button
               onClick={onEnterAdmin}
@@ -318,6 +333,44 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
             <p className="text-neutral-400 text-sm sm:text-base leading-relaxed max-w-3xl">
               O catálogo mais completo de sedas, cases, kits, dichavadores e acessórios. Monte seu carrinho e envie seu pedido diretamente no nosso WhatsApp.
             </p>
+
+            {/* VIP Group Call-To-Action Banner */}
+            <div className="mt-5 max-w-2xl">
+              <a
+                href={vipUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-neutral-900 to-neutral-900 border border-emerald-500/30 hover:border-emerald-500/70 shadow-lg shadow-emerald-500/5 hover:shadow-emerald-500/20 transition-all duration-300"
+                id="banner-grupo-vip"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform shrink-0 shadow-inner">
+                    <Crown className="w-6 h-6 text-emerald-400 animate-pulse" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-extrabold text-sm sm:text-base text-white group-hover:text-emerald-300 transition-colors">
+                        Grupo VIP no WhatsApp
+                      </span>
+                      <span className="bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/30 uppercase tracking-wider">
+                        Exclusivo
+                      </span>
+                    </div>
+                    <p className="text-xs text-neutral-300 mt-0.5 leading-snug">
+                      Ofertas especiais, novidades em primeira mão e descontos antecipados para membros.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="w-full sm:w-auto flex justify-end shrink-0">
+                  <span className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-black text-xs uppercase flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all group-hover:gap-2">
+                    <MessageCircle className="w-4 h-4" />
+                    <span>Entrar no Grupo VIP</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
+              </a>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -365,6 +418,21 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                 <div>
                   <span className="text-xs text-neutral-500 block">Prazo de Retirada</span>
                   <span className="text-xs text-neutral-400">{settings.pickupTime}</span>
+                </div>
+              </li>
+              <li className="flex gap-3 pt-3 border-t border-neutral-800">
+                <Crown className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                  <span className="text-xs text-neutral-500 block">Comunidade Oficial</span>
+                  <a
+                    href={vipUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1 mt-0.5 transition-colors"
+                  >
+                    <span>Grupo VIP no WhatsApp</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
                 </div>
               </li>
             </ul>

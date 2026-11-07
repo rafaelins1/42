@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Package, Layers, Settings, LogOut, Plus, 
   Trash2, Edit, Check, X, RefreshCw, AlertTriangle, MessageSquare, 
   DollarSign, TrendingUp, CheckCircle2, BadgePercent, User, MapPin,
-  Shield, Database, Image as ImageIcon, Upload, Camera
+  Shield, Database, Image as ImageIcon, Upload, Camera, Crown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, Category, StoreSettings, Order, OrderStatus } from '../types';
@@ -87,6 +87,7 @@ export default function AdminDashboard({
   const [setAddress, setSetAddress] = useState(settings.address);
   const [setDeliveryFee, setSetDeliveryFee] = useState(String(settings.deliveryFee));
   const [setPickupTime, setSetPickupTime] = useState(settings.pickupTime);
+  const [setVipGroupUrl, setSetVipGroupUrl] = useState(settings.vipGroupUrl || '');
 
   React.useEffect(() => {
     setSetStoreName(settings.storeName);
@@ -96,6 +97,7 @@ export default function AdminDashboard({
     setSetAddress(settings.address);
     setSetDeliveryFee(String(settings.deliveryFee));
     setSetPickupTime(settings.pickupTime);
+    setSetVipGroupUrl(settings.vipGroupUrl || '');
   }, [settings]);
 
   const handleProductImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -562,7 +564,8 @@ export default function AdminDashboard({
       address: setAddress,
       deliveryFee: parseFloat(setDeliveryFee) || 0,
       pickupTime: setPickupTime,
-      whatsappMessageTemplate: settings.whatsappMessageTemplate
+      whatsappMessageTemplate: settings.whatsappMessageTemplate,
+      vipGroupUrl: setVipGroupUrl.trim() || undefined
     });
     alert('Configurações salvas com sucesso!');
   };
@@ -1308,6 +1311,24 @@ export default function AdminDashboard({
                     className="w-full bg-neutral-950 border border-neutral-850 text-white rounded-lg py-2.5 px-3 text-xs focus:outline-none focus:border-purple-500 transition-colors resize-none"
                     id="settings-address"
                   />
+                </div>
+
+                <div className="space-y-1 p-3.5 bg-neutral-950 rounded-xl border border-neutral-850">
+                  <label className="text-xs text-neutral-300 block font-semibold flex items-center gap-1.5">
+                    <Crown className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Link do Grupo VIP no WhatsApp</span>
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://chat.whatsapp.com/..."
+                    value={setVipGroupUrl}
+                    onChange={(e) => setSetVipGroupUrl(e.target.value)}
+                    className="w-full bg-neutral-900 border border-neutral-800 text-white rounded-lg py-2.5 px-3 text-xs focus:outline-none focus:border-purple-500 transition-colors font-mono"
+                    id="settings-vipgroupurl"
+                  />
+                  <p className="text-[10px] text-neutral-500">
+                    Este link é exibido no banner de destaque e na barra lateral da tela inicial do catálogo para os clientes entrarem no seu Grupo VIP.
+                  </p>
                 </div>
 
                 <button

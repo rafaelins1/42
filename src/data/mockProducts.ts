@@ -32,7 +32,8 @@ export const defaultSettings: StoreSettings = {
   address: 'Rua Doutor Augusto Lopes Pontes 455, Salvador - BA',
   deliveryFee: 10.00,
   pickupTime: '24 horas',
-  whatsappMessageTemplate: 'Olá TabasGestion! Gostaria de fazer o seguinte pedido:'
+  whatsappMessageTemplate: 'Olá TabasGestion! Gostaria de fazer o seguinte pedido:',
+  vipGroupUrl: 'https://chat.whatsapp.com/I38enKB1mtzKN1yxNLuzZV?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAcGRvZgJzcnRjBmFwcF9pZA85MzY2MTk3NDMzOTI0NTkAAaeANudPlmE3P-wSV0SRjpLfqMxg0w6ekmZEKRuQugpoWQ0JM7UbEsDlCgflcw_aem_9aoKn118zHWAejZ0Bi4wrA'
 };
 
 export const initialProducts: Product[] = [
