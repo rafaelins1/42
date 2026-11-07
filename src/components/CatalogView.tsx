@@ -53,6 +53,10 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
   }, [products, selectedCategoryId, searchQuery]);
 
   // Total calculation
+  const totalCartQuantity = useMemo(() => {
+    return cart.reduce((sum, item) => sum + item.quantity, 0);
+  }, [cart]);
+
   const cartSubtotal = useMemo(() => {
     return cart.reduce((acc, item) => {
       const price = item.product.promoPrice ?? item.product.price;
@@ -66,11 +70,16 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
   // Add to cart logic
   const handleOpenProductDetail = (product: Product) => {
     setSelectedProduct(product);
-    setCartProductQuantity(1);
+    const inCart = cart
+      .filter(item => item.product.id === product.id)
+      .reduce((sum, item) => sum + item.quantity, 0);
+    const remaining = Math.max(0, product.stock - inCart);
+    setCartProductQuantity(remaining > 0 ? 1 : 0);
+
     // Initialize default variations
-    if (product.variations) {
+    if (product.variations && product.variations.length > 0) {
       const defaultVars = product.variations.map(v => ({
-        name: product.variations?.[0]?.name ?? 'Opção',
+        name: v.name,
         value: v.options[0]
       }));
       setSelectedProductVariations(defaultVars);
@@ -92,6 +101,25 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
   const handleAddToCart = () => {
     if (!selectedProduct) return;
 
+    if (selectedProduct.stock <= 0) {
+      alert(`Desculpe, o produto "${selectedProduct.name}" está esgotado no momento.`);
+      return;
+    }
+
+    const alreadyInCart = cart
+      .filter(item => item.product.id === selectedProduct.id)
+      .reduce((sum, item) => sum + item.quantity, 0);
+
+    const remainingStock = Math.max(0, selectedProduct.stock - alreadyInCart);
+
+    if (remainingStock <= 0) {
+      alert(`Você já adicionou a quantidade máxima disponível em estoque (${selectedProduct.stock} un) deste item ao seu carrinho.`);
+      return;
+    }
+
+    const quantityToAdd = Math.min(cartProductQuantity, remainingStock);
+    if (quantityToAdd <= 0) return;
+
     setCart(prevCart => {
       // Find identical item (same product ID AND same selected variations)
       const existingIndex = prevCart.findIndex(item => {
@@ -104,13 +132,13 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
 
       if (existingIndex > -1) {
         const updatedCart = [...prevCart];
-        updatedCart[existingIndex].quantity += cartProductQuantity;
+        updatedCart[existingIndex].quantity += quantityToAdd;
         return updatedCart;
       }
 
       return [...prevCart, {
         product: selectedProduct,
-        quantity: cartProductQuantity,
+        quantity: quantityToAdd,
         selectedVariations: [...selectedProductVars]
       }];
     });
@@ -122,7 +150,23 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
   const updateCartItemQuantity = (index: number, delta: number) => {
     setCart(prev => {
       const updated = [...prev];
-      const newQty = updated[index].quantity + delta;
+      const item = updated[index];
+      if (!item) return prev;
+
+      if (delta > 0) {
+        const otherQtyOfSameProduct = prev
+          .filter((it, i) => i !== index && it.product.id === item.product.id)
+          .reduce((sum, it) => sum + it.quantity, 0);
+        
+        const availableToAdd = Math.max(0, item.product.stock - otherQtyOfSameProduct);
+
+        if (item.quantity + delta > availableToAdd) {
+          alert(`Limite de estoque atingido! Há apenas ${item.product.stock} unidades disponíveis no momento.`);
+          return prev;
+        }
+      }
+
+      const newQty = item.quantity + delta;
       if (newQty <= 0) {
         updated.splice(index, 1);
       } else {
@@ -616,6 +660,7 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                     const hasPromo = product.promoPrice && product.promoPrice < product.price;
                     const displayPrice = hasPromo ? product.promoPrice! : product.price;
                     const discountPercent = hasPromo ? Math.round(((product.price - product.promoPrice!) / product.price) * 100) : 0;
+                    const isOutOfStock = product.stock <= 0;
 
                     return (
                       <motion.div
@@ -623,16 +668,22 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                         layout
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="bg-neutral-900 border border-neutral-800 hover:border-purple-500/50 transition-all rounded-xl overflow-hidden flex flex-col relative group"
+                        className={`bg-neutral-900 border border-neutral-800 hover:border-purple-500/50 transition-all rounded-xl overflow-hidden flex flex-col relative group ${
+                          isOutOfStock ? 'opacity-70' : ''
+                        }`}
                         id={`product-card-${product.id}`}
                       >
-                        {/* Promo Badge */}
-                        {hasPromo && (
+                        {/* Promo or Out of Stock Badge */}
+                        {isOutOfStock ? (
+                          <div className="absolute top-2.5 left-2 z-20 bg-red-600/90 text-white font-black text-[9px] px-2 py-0.5 rounded shadow-md uppercase tracking-wider">
+                            Esgotado
+                          </div>
+                        ) : hasPromo ? (
                           <div className="absolute top-2.5 left-0 z-20 bg-purple-500 text-neutral-950 font-black text-[10px] px-2 py-0.5 rounded-r flex items-center gap-0.5 shadow-md">
                             <BadgePercent className="w-3.5 h-3.5" />
                             -{discountPercent}%
                           </div>
-                        )}
+                        ) : null}
 
                         {/* Image Container with blurred background like Kyte app */}
                         <div 
@@ -643,7 +694,9 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                             <img
                               src={product.image}
                               alt={product.name}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${
+                                isOutOfStock ? 'grayscale contrast-75' : ''
+                              }`}
                               onError={(e) => {
                                 (e.target as HTMLElement).style.display = 'none';
                               }}
@@ -697,10 +750,14 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
 
                             <button
                               onClick={() => handleOpenProductDetail(product)}
-                              className="py-1 px-2.5 rounded-lg bg-neutral-950 hover:bg-neutral-800 border border-neutral-800 text-purple-400 hover:text-purple-300 text-xs font-semibold tracking-wide transition-colors flex items-center gap-1"
+                              className={`py-1 px-2.5 rounded-lg border text-xs font-semibold tracking-wide transition-colors flex items-center gap-1 ${
+                                isOutOfStock
+                                  ? 'bg-neutral-950 border-neutral-800 text-neutral-500 hover:text-neutral-400'
+                                  : 'bg-neutral-950 hover:bg-neutral-800 border-neutral-800 text-purple-400 hover:text-purple-300'
+                              }`}
                               id={`btn-product-buy-${product.id}`}
                             >
-                              <span>Ver</span>
+                              <span>{isOutOfStock ? 'Esgotado' : 'Ver'}</span>
                               <ChevronRight className="w-3.5 h-3.5" />
                             </button>
                           </div>
@@ -715,12 +772,15 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                   {filteredProducts.map((product) => {
                     const hasPromo = product.promoPrice && product.promoPrice < product.price;
                     const displayPrice = hasPromo ? product.promoPrice! : product.price;
+                    const isOutOfStock = product.stock <= 0;
 
                     return (
                       <motion.div
                         key={product.id}
                         layout
-                        className="bg-neutral-900 border border-neutral-800 hover:border-purple-500/30 transition-all rounded-xl overflow-hidden p-3 flex gap-4 relative group"
+                        className={`bg-neutral-900 border border-neutral-800 hover:border-purple-500/30 transition-all rounded-xl overflow-hidden p-3 flex gap-4 relative group ${
+                          isOutOfStock ? 'opacity-70' : ''
+                        }`}
                         id={`product-list-card-${product.id}`}
                       >
                         <div 
@@ -731,7 +791,7 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                             <img
                               src={product.image}
                               alt={product.name}
-                              className="w-full h-full object-cover"
+                              className={`w-full h-full object-cover ${isOutOfStock ? 'grayscale contrast-75' : ''}`}
                               onError={(e) => {
                                 (e.target as HTMLElement).style.display = 'none';
                               }}
@@ -739,11 +799,15 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                           ) : (
                             <span className="text-xl">🍂</span>
                           )}
-                          {hasPromo && (
+                          {isOutOfStock ? (
+                            <span className="absolute top-1 left-1 bg-red-600 text-white text-[8px] font-bold py-0.5 px-1 rounded z-10 uppercase">
+                              Esgotado
+                            </span>
+                          ) : hasPromo ? (
                             <span className="absolute top-1 left-1 bg-purple-500 text-neutral-950 text-[8px] font-bold py-0.5 px-1 rounded z-10">
                               PROMO
                             </span>
-                          )}
+                          ) : null}
                         </div>
 
                         <div className="flex-1 flex flex-col justify-between min-w-0">
@@ -770,11 +834,15 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
 
                             <button
                               onClick={() => handleOpenProductDetail(product)}
-                              className="py-1 px-3 rounded-lg bg-neutral-950 hover:bg-neutral-800 border border-neutral-800 text-purple-400 hover:text-purple-300 text-xs font-semibold tracking-wide transition-colors flex items-center gap-1"
+                              className={`py-1 px-3 rounded-lg border text-xs font-semibold tracking-wide transition-colors flex items-center gap-1 ${
+                                isOutOfStock
+                                  ? 'bg-neutral-950 border-neutral-800 text-neutral-500'
+                                  : 'bg-neutral-950 hover:bg-neutral-800 border-neutral-800 text-purple-400 hover:text-purple-300'
+                              }`}
                               id={`btn-product-buy-list-${product.id}`}
                             >
-                              <span>Adicionar</span>
-                              <ChevronRight className="w-3.5 h-3.5" />
+                              <span>{isOutOfStock ? 'Esgotado' : 'Adicionar'}</span>
+                              {!isOutOfStock && <ChevronRight className="w-3.5 h-3.5" />}
                             </button>
                           </div>
                         </div>
@@ -788,25 +856,74 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
         </section>
       </main>
 
-      {/* Floating Bottom Cart Bar (visible only on screens below 1024px, when items are in cart) */}
-      {cart.length > 0 && (
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-800 p-4 z-30 shadow-2xl flex items-center justify-between">
-          <div>
-            <span className="text-xs text-neutral-400 block">Carrinho Tabas</span>
-            <span className="text-base font-extrabold text-purple-500">R$ {cartSubtotal.toFixed(2).replace('.', ',')}</span>
-            <span className="text-[10px] text-neutral-500 block">({cart.reduce((sum, i) => sum + i.quantity, 0)} itens)</span>
-          </div>
-          <button
-            onClick={() => setIsCartOpen(true)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-500 text-neutral-950 font-bold text-sm shadow-lg hover:bg-purple-400 active:scale-95 transition-all"
-            id="btn-cart-floating-trigger"
+      {/* Floating WhatsApp Quick Contact Button */}
+      <a
+        href={`https://wa.me/${(settings.phone || '').replace(/\D/g, '')}?text=${encodeURIComponent('Olá! Vim pelo catálogo online TabasGestion e gostaria de atendimento.')}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-40 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#25D366] hover:bg-[#20ba59] active:scale-95 text-white flex items-center justify-center shadow-2xl shadow-emerald-500/40 hover:shadow-emerald-500/60 transition-all duration-300 group hover:scale-105 cursor-pointer ring-4 ring-emerald-500/20"
+        title={`Falar no WhatsApp (${settings.phone})`}
+        id="btn-floating-whatsapp"
+        aria-label="Atendimento via WhatsApp"
+      >
+        <span className="sr-only">Falar no WhatsApp</span>
+        {/* Subtle breathing glow */}
+        <span className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-25 group-hover:opacity-40"></span>
+        <svg className="w-7 h-7 sm:w-8 sm:h-8 fill-white relative z-10 drop-shadow-md group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
+          <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.007c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.174.086.275.072.376-.044.101-.116.433-.506.549-.68.116-.173.231-.145.39-.086s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.159.57 4.186 1.564 5.945l-1.564 5.709 5.867-1.539c1.716.941 3.682 1.475 5.773 1.475 6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z" />
+        </svg>
+      </a>
+
+      {/* Floating Bottom-Corner Cart Button (Floats right above WhatsApp) */}
+      <AnimatePresence>
+        {totalCartQuantity > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 30, scale: 0.9 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+            className="fixed bottom-22 right-5 sm:bottom-25 sm:right-6 z-40"
           >
-            <ShoppingCart className="w-4 h-4" />
-            <span>Ver Carrinho</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
-      )}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="group relative flex items-center gap-3.5 px-4 py-3 sm:px-5 sm:py-3.5 rounded-2xl bg-neutral-900/95 hover:bg-neutral-850 backdrop-blur-xl border border-purple-500/40 hover:border-purple-500 text-white shadow-2xl shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300 active:scale-95 cursor-pointer ring-1 ring-purple-500/20"
+              id="btn-cart-floating-trigger"
+              title="Visualizar Resumo do Pedido"
+            >
+              {/* Cart Icon with Counter Badge */}
+              <div className="relative shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-purple-500 text-neutral-950 flex items-center justify-center shadow-md shadow-purple-500/30 group-hover:scale-105 transition-transform">
+                  <ShoppingCart className="w-5 h-5 text-neutral-950" />
+                </div>
+                <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white font-mono font-black text-[11px] min-w-[20px] h-5 px-1 rounded-full flex items-center justify-center shadow-lg border border-neutral-900 animate-bounce">
+                  {totalCartQuantity}
+                </span>
+              </div>
+
+              {/* Text Info: Items count & Total */}
+              <div className="text-left pr-1">
+                <div className="flex items-center gap-1.5 leading-tight">
+                  <span className="text-xs sm:text-sm font-extrabold text-white">
+                    {totalCartQuantity} {totalCartQuantity === 1 ? 'item' : 'itens'}
+                  </span>
+                  <span className="text-neutral-500">•</span>
+                  <span className="text-xs sm:text-sm font-black text-purple-400 font-mono">
+                    R$ {cartSubtotal.toFixed(2).replace('.', ',')}
+                  </span>
+                </div>
+                <span className="text-[11px] text-neutral-400 group-hover:text-neutral-300 transition-colors block mt-0.5 font-medium">
+                  Ver resumo do pedido
+                </span>
+              </div>
+
+              {/* Arrow Indicator */}
+              <div className="w-7 h-7 rounded-lg bg-neutral-800 group-hover:bg-purple-500 group-hover:text-neutral-950 text-neutral-400 flex items-center justify-center transition-all shrink-0 ml-1">
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </div>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* FOOTER */}
       <footer className="bg-neutral-900 border-t border-neutral-800 py-10 px-4 mt-12 text-center text-xs text-neutral-500">
@@ -825,144 +942,198 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
 
       {/* PRODUCT DETAIL MODAL */}
       <AnimatePresence>
-        {selectedProduct && (
-          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-neutral-900 border border-neutral-800 rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative flex flex-col"
-              id="product-detail-modal"
-            >
-              <button
-                onClick={() => setSelectedProduct(null)}
-                className="absolute top-4 right-4 z-10 p-1.5 rounded-full bg-neutral-950 border border-neutral-800 text-neutral-400 hover:text-white transition-colors"
-                id="btn-close-product-detail"
+        {selectedProduct && (() => {
+          const inCartCount = cart
+            .filter(i => i.product.id === selectedProduct.id)
+            .reduce((sum, i) => sum + i.quantity, 0);
+          const remainingStock = Math.max(0, selectedProduct.stock - inCartCount);
+          const isOutOfStock = selectedProduct.stock <= 0;
+          const isStockLimitReached = selectedProduct.stock > 0 && remainingStock <= 0;
+
+          return (
+            <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-neutral-900 border border-neutral-800 rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative flex flex-col"
+                id="product-detail-modal"
               >
-                <X className="w-5 h-5" />
-              </button>
+                <button
+                  onClick={() => setSelectedProduct(null)}
+                  className="absolute top-4 right-4 z-10 p-1.5 rounded-full bg-neutral-950 border border-neutral-800 text-neutral-400 hover:text-white transition-colors"
+                  id="btn-close-product-detail"
+                >
+                  <X className="w-5 h-5" />
+                </button>
 
-              {/* Product Info */}
-              <div className="p-6 space-y-6">
-                
-                {/* Modal Visual Placeholder / Real Image */}
-                <div className="h-60 sm:h-72 bg-neutral-950 rounded-xl flex items-center justify-center relative border border-neutral-800 overflow-hidden">
-                  {selectedProduct.image ? (
-                    <img
-                      src={selectedProduct.image}
-                      alt={selectedProduct.name}
-                      className="w-full h-full object-contain bg-black/40"
-                    />
-                  ) : (
-                    <span className="text-5xl">🌿</span>
-                  )}
-                  {selectedProduct.promoPrice && (
-                    <span className="absolute top-3 left-3 bg-purple-500 text-neutral-950 text-xs font-black py-1 px-2.5 rounded-md shadow-md">
-                      OFERTA ESPECIAL
-                    </span>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-purple-500 font-mono">
-                      {categories.find(c => c.id === selectedProduct.category)?.name ?? 'Outros'}
-                    </span>
-                    {selectedProduct.code && (
-                      <span className="text-xs font-mono text-neutral-500">
-                        Código: {selectedProduct.code}
-                      </span>
+                {/* Product Info */}
+                <div className="p-6 space-y-6">
+                  
+                  {/* Modal Visual Placeholder / Real Image */}
+                  <div className="h-60 sm:h-72 bg-neutral-950 rounded-xl flex items-center justify-center relative border border-neutral-800 overflow-hidden">
+                    {selectedProduct.image ? (
+                      <img
+                        src={selectedProduct.image}
+                        alt={selectedProduct.name}
+                        className="w-full h-full object-contain bg-black/40"
+                      />
+                    ) : (
+                      <span className="text-5xl">🌿</span>
                     )}
-                  </div>
-                  <h3 className="text-xl font-bold text-white tracking-tight leading-tight">
-                    {selectedProduct.name}
-                  </h3>
-                  <p className="text-sm text-neutral-300 leading-relaxed">
-                    {selectedProduct.description}
-                  </p>
-                </div>
-
-                {/* Variations choice if any */}
-                {selectedProduct.variations && selectedProduct.variations.map((v) => (
-                  <div key={v.name} className="space-y-2 border-t border-neutral-800/80 pt-4">
-                    <label className="text-xs uppercase tracking-wider text-neutral-400 font-semibold block">{v.name}</label>
-                    <div className="flex flex-wrap gap-2">
-                      {v.options.map((option) => {
-                        const isSelected = selectedProductVars.find(sv => sv.name === v.name && sv.value === option);
-                        return (
-                          <button
-                            key={option}
-                            onClick={() => handleSelectVariationValue(v.name, option)}
-                            className={`py-1.5 px-3.5 rounded-lg text-xs font-semibold tracking-wide border transition-all ${
-                              isSelected
-                                ? 'bg-purple-500 text-neutral-950 border-purple-500 scale-105'
-                                : 'bg-neutral-950 text-neutral-400 border-neutral-800 hover:text-white hover:border-neutral-700'
-                            }`}
-                            id={`btn-option-${v.name}-${option}`}
-                          >
-                            {option}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-
-                {/* Buy Action Section */}
-                <div className="border-t border-neutral-800 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div>
-                    <span className="text-xs text-neutral-400 block leading-none">Preço do Produto</span>
-                    <div className="flex items-baseline gap-2 mt-1">
-                      <span className="text-2xl font-black text-purple-500">
-                        R$ {((selectedProduct.promoPrice ?? selectedProduct.price) * cartProductQuantity).toFixed(2).replace('.', ',')}
+                    {isOutOfStock ? (
+                      <span className="absolute top-3 left-3 bg-red-600 text-white text-xs font-black py-1 px-2.5 rounded-md shadow-md uppercase tracking-wide">
+                        PRODUTO ESGOTADO
                       </span>
-                      {selectedProduct.promoPrice && (
-                        <span className="text-xs text-neutral-500 line-through leading-none">
-                          R$ {(selectedProduct.price * cartProductQuantity).toFixed(2).replace('.', ',')}
+                    ) : selectedProduct.promoPrice ? (
+                      <span className="absolute top-3 left-3 bg-purple-500 text-neutral-950 text-xs font-black py-1 px-2.5 rounded-md shadow-md">
+                        OFERTA ESPECIAL
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-purple-500 font-mono">
+                        {categories.find(c => c.id === selectedProduct.category)?.name ?? 'Outros'}
+                      </span>
+                      {selectedProduct.code && (
+                        <span className="text-xs font-mono text-neutral-500">
+                          Código: {selectedProduct.code}
                         </span>
+                      )}
+                    </div>
+                    <h3 className="text-xl font-bold text-white tracking-tight leading-tight">
+                      {selectedProduct.name}
+                    </h3>
+                    <p className="text-sm text-neutral-300 leading-relaxed">
+                      {selectedProduct.description}
+                    </p>
+                  </div>
+
+                  {/* Variations choice if any */}
+                  {selectedProduct.variations && selectedProduct.variations.map((v) => (
+                    <div key={v.name} className="space-y-2 border-t border-neutral-800/80 pt-4">
+                      <label className="text-xs uppercase tracking-wider text-neutral-400 font-semibold block">{v.name}</label>
+                      <div className="flex flex-wrap gap-2">
+                        {v.options.map((option) => {
+                          const isSelected = selectedProductVars.find(sv => sv.name === v.name && sv.value === option);
+                          return (
+                            <button
+                              key={option}
+                              onClick={() => handleSelectVariationValue(v.name, option)}
+                              className={`py-1.5 px-3.5 rounded-lg text-xs font-semibold tracking-wide border transition-all ${
+                                isSelected
+                                  ? 'bg-purple-500 text-neutral-950 border-purple-500 scale-105'
+                                  : 'bg-neutral-950 text-neutral-400 border-neutral-800 hover:text-white hover:border-neutral-700'
+                              }`}
+                              id={`btn-option-${v.name}-${option}`}
+                            >
+                              {option}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Buy Action Section */}
+                  <div className="border-t border-neutral-800 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                      <span className="text-xs text-neutral-400 block leading-none">Preço do Produto</span>
+                      <div className="flex items-baseline gap-2 mt-1">
+                        <span className="text-2xl font-black text-purple-500">
+                          R$ {((selectedProduct.promoPrice ?? selectedProduct.price) * (cartProductQuantity || 1)).toFixed(2).replace('.', ',')}
+                        </span>
+                        {selectedProduct.promoPrice && (
+                          <span className="text-xs text-neutral-500 line-through leading-none">
+                            R$ {(selectedProduct.price * (cartProductQuantity || 1)).toFixed(2).replace('.', ',')}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Quantity manager */}
+                    <div className="flex items-center gap-3">
+                      {!isOutOfStock && !isStockLimitReached && (
+                        <div className="flex items-center rounded-xl bg-neutral-950 p-1 border border-neutral-800">
+                          <button
+                            onClick={() => setCartProductQuantity(prev => Math.max(1, prev - 1))}
+                            disabled={cartProductQuantity <= 1}
+                            className={`p-1.5 rounded-lg transition-all ${
+                              cartProductQuantity <= 1 ? 'text-neutral-700 cursor-not-allowed' : 'text-neutral-400 hover:text-white active:scale-95'
+                            }`}
+                            id="btn-modal-qty-decrease"
+                            title="Diminuir quantidade"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <span className="w-10 text-center text-sm font-bold font-mono">{cartProductQuantity}</span>
+                          <button
+                            onClick={() => setCartProductQuantity(prev => Math.min(remainingStock, prev + 1))}
+                            disabled={cartProductQuantity >= remainingStock}
+                            className={`p-1.5 rounded-lg transition-all ${
+                              cartProductQuantity >= remainingStock ? 'text-neutral-700 cursor-not-allowed' : 'text-neutral-400 hover:text-white active:scale-95'
+                            }`}
+                            id="btn-modal-qty-increase"
+                            title={cartProductQuantity >= remainingStock ? `Máximo disponível em estoque (${remainingStock} un)` : 'Aumentar quantidade'}
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+
+                      {isOutOfStock ? (
+                        <button
+                          disabled
+                          className="px-6 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-500 font-bold transition-all text-sm cursor-not-allowed"
+                          id="btn-modal-add-to-cart"
+                        >
+                          Produto Esgotado
+                        </button>
+                      ) : isStockLimitReached ? (
+                        <button
+                          disabled
+                          className="px-6 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-amber-500/80 font-bold transition-all text-sm cursor-not-allowed"
+                          id="btn-modal-add-to-cart"
+                        >
+                          Limite no Carrinho
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleAddToCart}
+                          className="px-6 py-2.5 rounded-xl bg-purple-500 hover:bg-purple-400 text-neutral-950 font-bold transition-all flex items-center gap-2 shadow-lg shadow-purple-500/10 active:scale-95 text-sm cursor-pointer"
+                          id="btn-modal-add-to-cart"
+                        >
+                          <ShoppingCart className="w-4 h-4" />
+                          <span>Adicionar ({cartProductQuantity})</span>
+                        </button>
                       )}
                     </div>
                   </div>
 
-                  {/* Quantity manager */}
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center rounded-xl bg-neutral-950 p-1 border border-neutral-800">
-                      <button
-                        onClick={() => setCartProductQuantity(prev => Math.max(1, prev - 1))}
-                        className="p-1.5 rounded-lg text-neutral-400 hover:text-white active:scale-95 transition-all"
-                        id="btn-modal-qty-decrease"
-                      >
-                        <Minus className="w-4 h-4" />
-                      </button>
-                      <span className="w-10 text-center text-sm font-bold font-mono">{cartProductQuantity}</span>
-                      <button
-                        onClick={() => setCartProductQuantity(prev => Math.min(selectedProduct.stock, prev + 1))}
-                        className="p-1.5 rounded-lg text-neutral-400 hover:text-white active:scale-95 transition-all"
-                        id="btn-modal-qty-increase"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
-                    </div>
-
-                    <button
-                      onClick={handleAddToCart}
-                      className="px-6 py-2.5 rounded-xl bg-purple-500 hover:bg-purple-400 text-neutral-950 font-bold transition-all flex items-center gap-2 shadow-lg shadow-purple-500/10 active:scale-95 text-sm"
-                      id="btn-modal-add-to-cart"
-                    >
-                      <ShoppingCart className="w-4 h-4" />
-                      <span>Adicionar</span>
-                    </button>
+                  <div className="text-[11px] text-center leading-none">
+                    {isOutOfStock ? (
+                      <span className="text-red-400 font-medium">Ops! Este produto está esgotado no estoque no momento.</span>
+                    ) : isStockLimitReached ? (
+                      <span className="text-amber-400 font-medium">
+                        Você já adicionou todas as <strong className="font-mono">{selectedProduct.stock} unidades</strong> disponíveis no seu carrinho.
+                      </span>
+                    ) : (
+                      <span className="text-neutral-400">
+                        Disponível em estoque: <span className="text-purple-400 font-mono font-semibold">{selectedProduct.stock} unidades</span>
+                        {inCartCount > 0 && (
+                          <span className="text-neutral-500 ml-1">({inCartCount} já no carrinho, restam {remainingStock})</span>
+                        )}
+                      </span>
+                    )}
                   </div>
-                </div>
 
-                <div className="text-[11px] text-neutral-500 text-center leading-none">
-                  Disponível em estoque para entrega imediata: <span className="text-neutral-400 font-mono font-semibold">{selectedProduct.stock} unidades</span>
                 </div>
-
-              </div>
-            </motion.div>
-          </div>
-        )}
+              </motion.div>
+            </div>
+          );
+        })()}
       </AnimatePresence>
 
       {/* SHOPPING CART OVERLAY MODAL */}
@@ -980,19 +1151,29 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
               {/* Header */}
               <div className="p-4 border-b border-neutral-800 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <ShoppingCart className="w-5 h-5 text-purple-500" />
-                  <h3 className="font-extrabold text-white">Seu Carrinho</h3>
-                  <span className="text-xs font-mono font-semibold py-0.5 px-2 bg-neutral-950 text-neutral-400 rounded-full">
-                    {cart.reduce((sum, item) => sum + item.quantity, 0)} itens
-                  </span>
+                  <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
+                    <ShoppingCart className="w-5 h-5 text-purple-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-white text-sm sm:text-base leading-tight">Resumo do Pedido</h3>
+                    <span className="text-[11px] text-neutral-400 block">
+                      Revise seus itens antes de finalizar
+                    </span>
+                  </div>
                 </div>
-                <button
-                  onClick={() => setIsCartOpen(false)}
-                  className="p-1.5 rounded-full hover:bg-neutral-800 transition-colors text-neutral-400 hover:text-white"
-                  id="btn-close-cart"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono font-bold py-1 px-2.5 bg-neutral-950 border border-neutral-800 text-purple-400 rounded-full">
+                    {totalCartQuantity} {totalCartQuantity === 1 ? 'item' : 'itens'}
+                  </span>
+                  <button
+                    onClick={() => setIsCartOpen(false)}
+                    className="p-1.5 rounded-full hover:bg-neutral-800 transition-colors text-neutral-400 hover:text-white"
+                    id="btn-close-cart"
+                    title="Fechar Resumo"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
 
               {/* Items List */}
@@ -1017,6 +1198,11 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                   <div className="space-y-3">
                     {cart.map((item, idx) => {
                       const itemPrice = item.product.promoPrice ?? item.product.price;
+                      const productInCartTotal = cart
+                        .filter(it => it.product.id === item.product.id)
+                        .reduce((sum, it) => sum + it.quantity, 0);
+                      const isMaxStockReached = productInCartTotal >= item.product.stock;
+
                       return (
                         <div key={idx} className="bg-neutral-950/80 border border-neutral-800 rounded-xl p-3 flex gap-3 relative">
                           <div className="w-12 h-12 bg-neutral-900 rounded-lg flex items-center justify-center text-xl border border-neutral-800 overflow-hidden shrink-0">
@@ -1034,9 +1220,16 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                                 {item.selectedVariations.map(v => `${v.name}: ${v.value}`).join(', ')}
                               </p>
                             )}
-                            <span className="text-xs font-bold text-purple-500 block mt-1">
-                              R$ {(itemPrice * item.quantity).toFixed(2).replace('.', ',')}
-                            </span>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-xs font-bold text-purple-500">
+                                R$ {(itemPrice * item.quantity).toFixed(2).replace('.', ',')}
+                              </span>
+                              {isMaxStockReached && (
+                                <span className="text-[10px] text-amber-400 font-mono font-medium bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                                  Máx: {item.product.stock} un
+                                </span>
+                              )}
+                            </div>
                           </div>
 
                           {/* Action triggers */}
@@ -1056,14 +1249,19 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                               onClick={() => updateCartItemQuantity(idx, -1)}
                               className="p-1 text-neutral-500 hover:text-white"
                               id={`btn-cart-qty-dec-${idx}`}
+                              title="Diminuir"
                             >
                               <Minus className="w-3.5 h-3.5" />
                             </button>
                             <span className="w-6 text-center text-xs font-mono font-bold">{item.quantity}</span>
                             <button
                               onClick={() => updateCartItemQuantity(idx, 1)}
-                              className="p-1 text-neutral-500 hover:text-white"
+                              disabled={isMaxStockReached}
+                              className={`p-1 transition-colors ${
+                                isMaxStockReached ? 'text-neutral-700 cursor-not-allowed' : 'text-neutral-500 hover:text-white'
+                              }`}
                               id={`btn-cart-qty-inc-${idx}`}
+                              title={isMaxStockReached ? `Estoque máximo atingido (${item.product.stock} un)` : 'Aumentar'}
                             >
                               <Plus className="w-3.5 h-3.5" />
                             </button>
