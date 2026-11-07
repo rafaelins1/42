@@ -1,380 +1,1648 @@
 {
   "products": [
     {
-      "stock": 5,
-      "promoPrice": 79.99,
+      "image": "/assets/products/kit_hall_of_weed.png",
+      "featured": true,
       "isActive": true,
-      "id": "kit-azul-hippster",
-      "description": "Kit completo premium montado em case anti-impacto Hippster Club azul. Contém: Case, dichavador, cuia de silicone, isqueiro Clipper recarregável, piteira de vidro, seda e porta-beck.",
-      "name": "KIT AZUL Case HIPPSTER CLUB - COMPLETO",
-      "category": "KITS_COMPLETOS",
-      "price": 90,
+      "promoPrice": 34.99,
+      "stock": 8,
+      "description": "Kit lata completo temático Hall of Weed contendo acessórios essenciais para sua sessão.",
       "code": "KIT-001",
-      "featured": true
+      "category": "KITS_COMPLETOS",
+      "name": "KIT Lata HALL OF WEED - COMPLETO",
+      "id": "prod-kit-hall-of-weed",
+      "price": 40
     },
     {
-      "price": 90,
-      "name": "KIT LARANJA Case HIPPSTER CLUB - COMPLETO",
-      "featured": true,
-      "description": "Kit completo premium montado em case anti-impacto Hippster Club laranja vibrante. Perfeito para transporte seguro e discreto com todos os acessórios inclusos.",
-      "stock": 4,
+      "promoPrice": 9.99,
+      "code": "FLT-001",
+      "image": "/assets/products/filtro_papelito_biodegradavel.png",
       "isActive": true,
-      "code": "KIT-002",
-      "id": "kit-laranja-hippster",
-      "category": "KITS_COMPLETOS"
+      "stock": 25,
+      "id": "prod-filtro-papelito-bio",
+      "category": "FILTROS",
+      "name": "Filtro PAPELITO biodegradável",
+      "description": "Pacote de filtros ecológicos biodegradáveis Papelito para redução de danos.",
+      "price": 12
     },
     {
-      "id": "kit-premium-amarelo",
-      "promoPrice": 139.99,
-      "featured": true,
-      "stock": 3,
-      "code": "KIT-003",
-      "name": "KIT PREMIUM AMARELO Case HIPPSTER CLUB - COMPLETO",
+      "price": 12.5,
+      "name": "Filtro PAPELITO longo biodegradável",
+      "promoPrice": 10.99,
+      "id": "prod-filtro-papelito-longo-bio",
+      "category": "FILTROS",
+      "code": "FLT-002",
+      "stock": 20,
       "isActive": true,
-      "price": 170,
-      "description": "Edição de colecionador premium. Case rígido amarelo especial contendo acessórios selecionados de alta qualidade das melhores marcas.",
-      "category": "KITS_COMPLETOS"
+      "description": "Filtros longos biodegradáveis Papelito, resfriamento aprimorado e menor impacto ambiental.",
+      "image": "/assets/products/filtro_papelito_longo_biodegradavel.png"
     },
     {
-      "code": "SED-001",
-      "id": "seda-piteira-papelito",
-      "isActive": true,
-      "stock": 35,
-      "price": 8.5,
-      "category": "SEDA_BLUNTS",
-      "name": "1 Und Seda + Piteira PAPELITO bandeja dobrável",
-      "description": "Seda king size Papelito premium Brown/Alvejada + piteira em papel de alta qualidade, com bandeja dobrável integrada no livreto."
-    },
-    {
-      "id": "seda-blue-silk",
-      "code": "SED-002",
-      "category": "SEDA_BLUNTS",
-      "stock": 120,
-      "description": "Seda de alta qualidade com combustão lenta e papel extra fino. Ótimo custo-benefício para o dia a dia.",
-      "price": 1.11,
-      "name": "1 Und Seda BLUE SILK",
+      "price": 12,
+      "id": "prod-filtro-papelito-slim",
+      "description": "Filtro clássico modelo slim Papelito de alta densidade.",
+      "name": "Filtro PAPELITO slim",
+      "promoPrice": 9.99,
+      "category": "FILTROS",
+      "code": "FLT-003",
+      "stock": 30,
+      "image": "/assets/products/filtro_papelito_slim.png",
       "isActive": true
     },
     {
+      "code": "FLT-004",
+      "description": "Edição ultra longo Papelito para máxima filtragem e conforto.",
+      "price": 17.5,
+      "category": "FILTROS",
+      "id": "prod-filtro-papelito-ultra-longo",
+      "image": "/assets/products/filtro_papelito_ultra_longo.png",
+      "name": "Filtro PAPELITO ultra longo",
       "isActive": true,
-      "description": "Seda Bros cor de rosa super charmosa com 66 folhas. Papel fino, queima lenta e cola orgânica natural.",
-      "stock": 40,
-      "price": 5.5,
-      "name": "1 Und Seda BROS rosa (66 folhas)",
-      "code": "SED-003",
-      "category": "SEDA_BLUNTS",
-      "id": "seda-bros-rosa"
+      "stock": 15,
+      "promoPrice": 14.99
     },
     {
+      "id": "prod-filtro-bembolado-slim-bio",
+      "category": "FILTROS",
+      "stock": 22,
+      "name": "Filtro slim biodegradável BEMBOLADO",
+      "image": "/assets/products/filtro_bembolado_slim_biodegradavel.png",
+      "promoPrice": 8.99,
+      "description": "Filtros slim 100% biodegradáveis Bem Bolado Brasil.",
+      "code": "FLT-005",
+      "price": 11,
+      "isActive": true
+    },
+    {
+      "id": "prod-filtro-papelito-longo-tradicional",
+      "description": "Filtro tradicional longo Papelito com 120 unidades por pacote.",
+      "code": "FLT-006",
+      "price": 12,
+      "category": "FILTROS",
+      "image": "/assets/products/filtro_papelito_longo_tradicional.png",
+      "promoPrice": 9.99,
+      "isActive": true,
+      "name": "Filtro PAPELITO longo tradicional",
+      "stock": 25
+    },
+    {
+      "code": "SDA-001",
+      "isActive": true,
+      "price": 5,
+      "id": "prod-seda-papelito-mini-brown",
+      "image": "/assets/products/seda_papelito_mini_brown.png",
+      "name": "1 seda PAPELITO mini brown",
+      "stock": 40,
+      "promoPrice": 2.99,
+      "description": "Seda marrom não branqueada mini size Papelito, queima lenta e natural.",
+      "category": "SEDA_BLUNTS"
+    },
+    {
+      "image": "/assets/products/seda_piteira_papelito_bandeja.png",
+      "isActive": true,
+      "promoPrice": 7.99,
       "featured": true,
-      "code": "PIT-001",
-      "promoPrice": 60,
-      "stock": 12,
-      "description": "Piteira de vidro borossilicato Penguim XL. Reduz danos, resfria a fumaça e é totalmente lavável e reutilizável.",
-      "id": "piteira-vidro-penguim-xl",
+      "id": "prod-seda-piteira-papelito-bandeja",
+      "code": "SDA-002",
+      "description": "Combo completo de seda King Size + piteira e embalagem que se transforma em bandeja dobrável.",
+      "stock": 35,
+      "category": "SEDA_BLUNTS",
+      "name": "1 Und Seda + Piteira PAPELITO bandeja dobrável",
+      "price": 10
+    },
+    {
+      "price": 6.5,
+      "name": "1 Und Seda BEM BOLADO slim",
+      "category": "SEDA_BLUNTS",
+      "description": "Livretinho clássico Seda Bem Bolado Brasil formato slim.",
+      "stock": 50,
+      "code": "SDA-003",
+      "promoPrice": 4.99,
+      "id": "prod-seda-bem-bolado-slim",
+      "isActive": true,
+      "image": "/assets/products/seda_bem_bolado_slim.png"
+    },
+    {
+      "image": "/assets/products/seda_celulose_aleda_kingsize.png",
+      "category": "SEDA_BLUNTS",
+      "promoPrice": 4.99,
+      "stock": 30,
+      "code": "SDA-004",
+      "isActive": true,
+      "id": "prod-seda-celulose-aleda-ks",
+      "name": "1 und seda celulose ALEDA Kingsize",
+      "description": "Seda 100% celulose vegetal transparente original aLeda King Size.",
+      "price": 6.5
+    },
+    {
+      "id": "prod-seda-celulose-lion-circus-g",
+      "code": "SDA-005",
+      "price": 8,
+      "isActive": true,
+      "promoPrice": 4.99,
+      "image": "/assets/products/seda_celulose_lion_circus_g.png",
+      "category": "SEDA_BLUNTS",
+      "name": "1 Und Seda Celulose LION CIRCUS G",
+      "stock": 25,
+      "description": "Seda celulose vegetal Lion Rolling Circus tamanho grande."
+    },
+    {
+      "category": "SEDA_BLUNTS",
+      "price": 8,
+      "promoPrice": 4.99,
+      "name": "1 Und Seda Celulose LION CIRCUS P",
+      "isActive": true,
+      "id": "prod-seda-celulose-lion-circus-p",
+      "stock": 25,
+      "image": "/assets/products/seda_celulose_lion_circus_p.png",
+      "description": "Seda celulose vegetal Lion Rolling Circus tamanho pequeno 1 1/4.",
+      "code": "SDA-006"
+    },
+    {
+      "stock": 6,
       "name": "Piteira de Vidro PENGUIM XL",
       "isActive": true,
-      "price": 70,
+      "featured": true,
+      "image": "/assets/products/piteira_vidro_penguim_xl.png",
+      "id": "prod-piteira-vidro-penguim-xl",
+      "price": 75,
+      "promoPrice": 69.99,
+      "code": "PTV-001",
+      "description": "Piteira artesanal em vidro borossilicato com miniatura de pinguim modelada à mão.",
+      "category": "PITEIRAS_VIDRO"
+    },
+    {
+      "price": 50,
+      "name": "Piteira de vidro PINGUIM all black caliglas",
+      "id": "prod-piteira-vidro-pinguim-black",
+      "category": "PITEIRAS_VIDRO",
+      "code": "PTV-002",
+      "description": "Piteira de vidro artesanal borossilicato linha All Black Caliglass.",
+      "stock": 5,
+      "isActive": true,
+      "promoPrice": 39.99
+    },
+    {
+      "promoPrice": 44.99,
+      "price": 50,
+      "id": "prod-piteira-vidro-cogu-sorriso",
+      "name": "Piteira de vidro COGU SORRISO all black",
+      "category": "PITEIRAS_VIDRO",
+      "stock": 5,
+      "code": "PTV-003",
+      "isActive": true,
+      "description": "Piteira de vidro borossilicato com detalhe cogumelo sorriso."
+    },
+    {
+      "price": 45,
+      "name": "Piteira de vidro PENGUIM caliglass",
+      "promoPrice": 39.99,
+      "isActive": true,
+      "description": "Piteira especial de vidro Caliglass com detalhe pinguim.",
+      "stock": 5,
+      "code": "PTV-004",
+      "id": "prod-piteira-vidro-pinguim-caliglass",
       "category": "PITEIRAS_VIDRO"
     },
     {
       "price": 75,
-      "description": "Dichavador premium formato de cubo oficial Lion Rolling Circus. 4 partes com tela coletora de kief e dentes de metal ultra resistentes.",
-      "isActive": true,
-      "id": "dichavador-cubo-lrc",
-      "name": "1 Und Dichavador Cubo LION ROLLING CIRCUS 4 partes",
       "category": "DICHAVADORES",
-      "stock": 8,
-      "code": "DIC-001",
-      "promoPrice": 45,
-      "featured": true
+      "name": "1 Und Dichavador Cubo LION ROLLING CIRCUS 4 partes",
+      "promoPrice": 39.99,
+      "description": "Dichavador metálico premium em formato de cubo mágico com 4 partes e reservatório com tela de kief.",
+      "isActive": true,
+      "stock": 7,
+      "code": "DCH-001",
+      "id": "prod-dichavador-cubo-lion-circus",
+      "featured": true,
+      "image": "/assets/products/dichavador_cubo_lion_circus.png"
     },
     {
-      "stock": 15,
-      "id": "dichavador-cubo-mystic",
-      "name": "1 Und Dichavador Cubo MYSTIC TIMBERS 4 partes",
-      "price": 50,
-      "isActive": true,
-      "code": "DIC-002",
+      "stock": 12,
       "variations": [
         {
-          "name": "Acabamento",
+          "name": "Modelo",
           "options": [
-            "Madeira Escura",
-            "Madeira Clara"
+            "Opção 1",
+            "Opção 2",
+            "Opção 3",
+            "Opção 4"
           ]
         }
       ],
-      "description": "Dichavador de alta durabilidade com design elegante Mystic Timbers. Ideal para triturar de forma homogênea.",
-      "category": "DICHAVADORES"
+      "description": "Dichavador em cubo de 4 partes com estampas psicodélicas Mystic Timbers.",
+      "category": "DICHAVADORES",
+      "name": "1 Und Dichavador Cubo MYSTIC TIMBERS 4 partes",
+      "promoPrice": 34.99,
+      "image": "/assets/products/dichavador_cubo_mystic_timbers.png",
+      "isActive": true,
+      "price": 45,
+      "code": "DCH-002",
+      "id": "prod-dichavador-cubo-mystic"
     },
     {
-      "category": "SLICKS",
-      "price": 35,
+      "category": "DICHAVADORES",
+      "variations": [
+        {
+          "options": [
+            "Edgar",
+            "Ruby",
+            "Silver",
+            "Mr. Trampoline",
+            "Sexy Sadie"
+          ],
+          "name": "Personagem"
+        }
+      ],
+      "description": "Dichavador colecionável dos personagens icônicos Lion Rolling Circus.",
+      "promoPrice": 9.99,
+      "image": "/assets/products/dichavador_lion_rolling_circus.png",
+      "code": "DCH-003",
+      "stock": 15,
       "isActive": true,
+      "name": "1 Und Dichavador LION ROLLING CIRCUS",
+      "price": 15,
+      "id": "prod-dichavador-lion-circus"
+    },
+    {
+      "id": "prod-dichavador-to-na-be-2p",
+      "stock": 18,
+      "category": "DICHAVADORES",
+      "name": "1 Und Dichavador To na Bê 2 partes",
+      "price": 15,
+      "description": "Dichavador prático e resistente de 2 fases Tô na Bê.",
+      "code": "DCH-004",
+      "variations": [
+        {
+          "options": [
+            "Laranja",
+            "Verde",
+            "Preto",
+            "Roxo",
+            "Rosa",
+            "Amarelo"
+          ],
+          "name": "Cor/Arte"
+        }
+      ],
+      "promoPrice": 9.99,
+      "isActive": true
+    },
+    {
+      "promoPrice": 19.99,
+      "category": "DICHAVADORES",
+      "description": "Dichavador geométrico acrílico transparente em formato triangular Squadafum.",
+      "code": "DCH-005",
+      "stock": 10,
+      "id": "prod-dichavador-squadafum-triangulo",
+      "isActive": true,
+      "name": "Dchavador SQUADAFUM triângulo",
+      "price": 25
+    },
+    {
+      "category": "DICHAVADORES",
+      "id": "prod-dichavador-cremaria-fibra-coco",
+      "promoPrice": 11.99,
+      "stock": 14,
+      "name": "Dichavador CREMARIA fibra de coco",
+      "description": "Dichavador sustentável ecológico produzido com fibra natural de coco Cremaria.",
+      "price": 17.5,
+      "isActive": true,
+      "code": "DCH-006"
+    },
+    {
+      "image": "/assets/products/piteira_bamf_large.png",
+      "id": "prod-piteira-bamf-large",
+      "promoPrice": 7.99,
+      "code": "PTP-001",
+      "stock": 30,
+      "isActive": true,
+      "description": "Piteira de papel perfurada formato Large para enrolar com firmeza.",
+      "category": "PITEIRAS_PAPEL",
+      "name": "1 Und Piteira BAMF Large",
+      "price": 9
+    },
+    {
+      "price": 7.5,
+      "name": "1 Und Piteira BEM BOLADO Cone",
+      "isActive": true,
+      "description": "Piteiras anatômicas pré-formadas formato Cone Bem Bolado.",
+      "id": "prod-piteira-bem-bolado-cone",
+      "promoPrice": 5.99,
+      "stock": 25,
+      "image": "/assets/products/piteira_bem_bolado_cone.png",
+      "code": "PTP-002",
+      "category": "PITEIRAS_PAPEL"
+    },
+    {
+      "code": "PTP-003",
+      "image": "/assets/products/piteira_bembolado_large.png",
+      "category": "PITEIRAS_PAPEL",
+      "stock": 40,
+      "promoPrice": 3.99,
+      "name": "1 Und Piteira BEMBOLADO Large",
+      "id": "prod-piteira-bembolado-large",
+      "price": 5.5,
+      "isActive": true,
+      "description": "Piteira de papel Large com picote Bem Bolado."
+    },
+    {
+      "stock": 20,
+      "name": "1 Und Piteira HIPPSTERCLUB XXL",
+      "category": "PITEIRAS_PAPEL",
+      "image": "/assets/products/piteira_hippsterclub_xxl.png",
+      "description": "Bloco de piteiras tamanho extra-longo XXL Hippster Club.",
+      "price": 13,
+      "promoPrice": 9.99,
+      "code": "PTP-004",
+      "id": "prod-piteira-hippsterclub-xxl",
+      "isActive": true
+    },
+    {
+      "promoPrice": 6.99,
+      "stock": 25,
+      "isActive": true,
+      "image": "/assets/products/piteira_nilo_xxl.png",
+      "name": "1 Und Piteira NILO XXL",
+      "description": "Piteira de papel kraft Nilo formato XXL.",
+      "category": "PITEIRAS_PAPEL",
+      "id": "prod-piteira-nilo-xxl",
+      "price": 8.5,
+      "code": "PTP-005"
+    },
+    {
+      "category": "PITEIRAS_PAPEL",
+      "code": "PTP-006",
+      "image": "/assets/products/piteira_papelito_fun_large.png",
+      "stock": 30,
+      "isActive": true,
+      "name": "1 Und Piteira PAPELITO FUN large",
+      "promoPrice": 5.5,
+      "description": "Piteiras coloridas e divertidas Papelito linha Fun tamanho large.",
+      "price": 6.5,
+      "id": "prod-piteira-papelito-fun-large"
+    },
+    {
+      "price": 28,
+      "name": "1 Und Slick Com Divisor SQUADAFUM 25ml",
       "variations": [
         {
           "name": "Cor",
           "options": [
-            "Rosa/Preto",
-            "Azul/Verde",
-            "Preto Sólido"
+            "Laranja",
+            "Amarelo",
+            "Roxo"
           ]
         }
       ],
-      "name": "1 Und Slick Com Divisor SQUADAFUM 25ml",
-      "stock": 22,
-      "code": "SLI-001",
-      "id": "slick-divisor-squadafum",
-      "description": "Pote de silicone Squadafum de 25ml com divisória interna. Ideal para armazenar suas extrações com segurança, sem grudar e mantendo as propriedades."
+      "promoPrice": 24.99,
+      "id": "prod-slick-divisor-squadafum",
+      "category": "SLICKS",
+      "description": "Pote hermético em silicone de cura platina com divisória interna Squadafum 25ml.",
+      "stock": 10,
+      "code": "SLK-001",
+      "isActive": true,
+      "image": "/assets/products/slick_divisor_squadafum_25ml.png"
     },
     {
       "category": "SLICKS",
-      "name": "1 Und Slick LEGO 26ML",
-      "stock": 18,
-      "id": "slick-lego-26ml",
+      "code": "SLK-002",
+      "image": "/assets/products/slick_cultdab_5ml.png",
+      "stock": 15,
+      "description": "Slick de silicone platina Cultdab tamanho 5ml.",
+      "id": "prod-slick-cultdab-5ml",
       "isActive": true,
+      "promoPrice": 19.99,
+      "name": "1 Und Slick CULTDAB 5ml",
+      "price": 25
+    },
+    {
+      "image": "/assets/products/slick_lego_26ml.png",
+      "id": "prod-slick-lego-26ml",
+      "code": "SLK-003",
+      "category": "SLICKS",
+      "stock": 12,
       "variations": [
         {
           "options": [
-            "Colorido",
-            "Amarelo/Roxo",
-            "Verde Neon"
+            "Lilás/Azul",
+            "Roxo/Rosa",
+            "Verde/Amarelo",
+            "Preto/Vermelho",
+            "Azul/Branco",
+            "Tie-Dye"
           ],
           "name": "Cor"
         }
       ],
-      "description": "Recipiente de silicone modular empilhável modelo bloco de Lego. Capacidade de 26ml para armazenamento seguro.",
-      "price": 24.99,
-      "code": "SLI-002"
-    },
-    {
-      "stock": 14,
-      "id": "cuia-banheira-silly-g",
-      "category": "CUIAS",
-      "name": "1 Und Cuia Banheira Silicone Bandeja SILLY TRAY - G",
-      "description": "Cuia de silicone de tamanho Grande em formato de banheira Silly Tray. Espaço perfeito para picotar suas ervas sem desperdício.",
       "isActive": true,
-      "variations": [
-        {
-          "name": "Cor",
-          "options": [
-            "Mármore Roxo",
-            "Preto Sólido",
-            "Splash Neon"
-          ]
-        }
-      ],
-      "price": 22.5,
-      "code": "CUI-001"
-    },
-    {
-      "description": "Isqueiro Clipper oficial, recarregável e com pedra trocável. Acessório indispensável com o famoso pilador embutido.",
-      "price": 9,
-      "name": "1 Und Isqueiro CLIPER Recarregável",
-      "isActive": true,
-      "stock": 55,
-      "code": "ISQ-001",
-      "category": "ISQUEIROS_MACARICOS",
-      "id": "isqueiro-clipper",
-      "variations": [
-        {
-          "options": [
-            "Psychedelic",
-            "Classic Black",
-            "Metal Gold",
-            "Skull Art"
-          ],
-          "name": "Estampa"
-        }
-      ]
-    },
-    {
-      "code": "ISQ-002",
-      "description": "Maçarico compacto profissional recarregável a gás butano. Chama potente com controle de intensidade e trava de segurança.",
-      "featured": true,
-      "price": 27.5,
-      "category": "ISQUEIROS_MACARICOS",
-      "stock": 10,
-      "isActive": true,
-      "name": "1 Und Maçarico PROF Recarregável",
-      "id": "macarico-prof-recarregavel"
-    },
-    {
-      "id": "tesoura-metal-garca",
-      "isActive": true,
-      "code": "TES-001",
-      "price": 35,
-      "category": "TESOURAS",
-      "promoPrice": 24.99,
-      "name": "1 Und Tesoura de Metal Garça",
-      "stock": 6,
-      "description": "Tesoura de metal cirúrgico com design clássico de garça. Ponta fina e afiação precisa, ideal para picotar com maestria."
-    },
-    {
-      "category": "HEADSHOP",
-      "name": "1 Und Anel F1 SADHU",
-      "price": 9.99,
-      "description": "Anel de silicone Sadhu porta cigarro. Permite que você segure seu beck enquanto joga, digita ou dirige sem queimar os dedos.",
-      "id": "anel-f1-sadhu",
-      "isActive": true,
-      "variations": [
-        {
-          "name": "Tamanho",
-          "options": [
-            "M (18mm)",
-            "G (20mm)"
-          ]
-        }
-      ],
-      "stock": 30,
-      "code": "HEA-001"
-    },
-    {
+      "name": "1 Und Slick LEGO 26ML",
       "price": 25,
+      "description": "Slick empilhável estilo Lego de 26ml antiaderente em silicone.",
+      "promoPrice": 19.99
+    },
+    {
+      "image": "/assets/products/slick_mini_cactus_5ml.png",
+      "isActive": true,
+      "description": "Slick divertido em formato de cacto miniatura 5ml.",
+      "stock": 14,
+      "code": "SLK-004",
+      "category": "SLICKS",
+      "promoPrice": 17.99,
+      "id": "prod-slick-mini-cactus-5ml",
+      "name": "1 Und Slick MINI CACTUS 5ML",
+      "price": 23
+    },
+    {
+      "image": "/assets/products/slick_sadhu_9ml_3div.png",
+      "description": "Slick redondo Sadhu com 3 compartimentos internos para separar diferentes extratos.",
+      "category": "SLICKS",
+      "stock": 12,
+      "code": "SLK-005",
+      "isActive": true,
+      "id": "prod-slick-sadhu-9ml-3div",
+      "name": "1 Und Slick SADHU 9ml 3 div",
+      "price": 35,
+      "promoPrice": 22.99
+    },
+    {
+      "isActive": true,
+      "code": "SLK-006",
+      "price": 50,
+      "description": "Estojo slick Sadhu com espátula de metal para manuseio acoplada.",
+      "image": "/assets/products/slick_sadhu_com_espatula.png",
+      "id": "prod-slick-sadhu-espatula",
+      "promoPrice": 37.99,
+      "category": "SLICKS",
+      "stock": 8,
+      "name": "1 Und Slick SADHU Com Espátula 12,5ml"
+    },
+    {
+      "category": "CUIAS",
+      "image": "/assets/products/cuia_banheira_silly_tray_laranja.png",
+      "code": "CUA-001",
+      "stock": 9,
+      "id": "prod-cuia-banheira-silly-tray-g-laranja",
+      "isActive": true,
+      "description": "Cuia no formato banheira grande Silly Tray dobrável em silicone.",
+      "variations": [
+        {
+          "options": [
+            "Laranja",
+            "Amarelo",
+            "Azul"
+          ],
+          "name": "Cor"
+        }
+      ],
+      "promoPrice": 22.5,
+      "price": 26,
+      "name": "1 Und Cuia Banheira Silicone Bandeja SILLY TRAY - Tamanho G"
+    },
+    {
+      "code": "CUA-002",
+      "promoPrice": 20,
+      "price": 24,
+      "isActive": true,
+      "description": "Cuia de silicone Silly Tray tamanho grande em cores vibrantes.",
       "variations": [
         {
           "name": "Cor",
           "options": [
+            "Verde Oliva",
+            "Preto",
+            "Vermelho",
+            "Cinza",
+            "Azul Marinho"
+          ]
+        }
+      ],
+      "id": "prod-cuia-banheira-silly-tray-g-verde",
+      "name": "1 Und Cuia Banheira Silicone SILLY TRAY - Tamanho G",
+      "image": "/assets/products/cuia_banheira_silly_tray_verde.png",
+      "stock": 11,
+      "category": "CUIAS"
+    },
+    {
+      "category": "CUIAS",
+      "promoPrice": 18,
+      "code": "CUA-003",
+      "image": "/assets/products/cuia_banheira_silly_tray_azul.png",
+      "variations": [
+        {
+          "options": [
+            "Azul Bebê",
+            "Rosa",
+            "Amarelo",
+            "Preto"
+          ],
+          "name": "Cor"
+        }
+      ],
+      "stock": 15,
+      "id": "prod-cuia-banheira-silly-tray-p",
+      "description": "Cuia formato banheira tamanho compacto Silly Tray.",
+      "name": "1 Und Cuia Banheira Silicone SILLY TRAY - Tamanho P",
+      "isActive": true,
+      "price": 22
+    },
+    {
+      "price": 15,
+      "name": "1 Und Cuia Chaveiro HOLDER M",
+      "description": "Cuia de silicone com argola de chaveiro para transporte acoplado.",
+      "id": "prod-cuia-chaveiro-holder-m",
+      "category": "CUIAS",
+      "code": "CUA-004",
+      "stock": 18,
+      "promoPrice": 11.99,
+      "variations": [
+        {
+          "options": [
+            "Vermelho",
+            "Preto",
             "Azul",
             "Verde",
+            "Laranja",
+            "Roxo"
+          ],
+          "name": "Cor"
+        }
+      ],
+      "isActive": true,
+      "image": "/assets/products/cuia_chaveiro_holder_m.png"
+    },
+    {
+      "stock": 20,
+      "category": "CUIAS",
+      "name": "1 Und Cuia de Silicone ABDUZIDO G",
+      "image": "/assets/products/cuia_silicone_abduzido_g.png",
+      "price": 16,
+      "code": "CUA-005",
+      "isActive": true,
+      "description": "Cuia redonda de silicone flexível Abduzido tamanho G.",
+      "id": "prod-cuia-silicone-abduzido-g",
+      "variations": [
+        {
+          "name": "Cor",
+          "options": [
+            "Azul Claro",
             "Preto",
+            "Verde",
             "Amarelo",
+            "Branco",
+            "Roxo"
+          ]
+        }
+      ],
+      "promoPrice": 11.99
+    },
+    {
+      "category": "CUIAS",
+      "price": 18,
+      "description": "Cuia de silicone Hippster Club grande com logo gravado.",
+      "name": "1 Und Cuia de Silicone HIPPSTER CLUB G",
+      "isActive": true,
+      "stock": 25,
+      "id": "prod-cuia-silicone-hippster-g",
+      "variations": [
+        {
+          "name": "Cor",
+          "options": [
+            "Preto",
+            "Branco",
+            "Vermelho",
+            "Azul",
+            "Verde",
+            "Laranja",
+            "Amarelo",
+            "Roxo",
             "Cinza"
           ]
         }
       ],
-      "description": "Mantenha seu beck seguro e à prova de água e odores. Tubo de metal de alta resistência Bem Bolado.",
+      "code": "CUA-006",
+      "promoPrice": 13.99
+    },
+    {
+      "price": 12,
+      "name": "1 Und Isqueiro CLIPER Recarregável",
+      "category": "ISQUEIROS_MACARICOS",
+      "description": "O clássico isqueiro redondo Clipper recarregável com pilão embutido.",
+      "promoPrice": 9.99,
+      "variations": [
+        {
+          "options": [
+            "Azul Bebê",
+            "Preto",
+            "Branco",
+            "Vermelho",
+            "Amarelo"
+          ],
+          "name": "Cor"
+        }
+      ],
+      "stock": 30,
+      "isActive": true,
+      "image": "/assets/products/isqueiro_cliper_recarregavel.png",
+      "featured": true,
+      "id": "prod-isqueiro-cliper-recarregavel",
+      "code": "ISQ-001"
+    },
+    {
+      "price": 12.5,
+      "name": "1 Und Zippo Recarregável",
+      "id": "prod-isqueiro-zippo-recarregavel",
+      "isActive": true,
+      "promoPrice": 8.99,
+      "code": "ISQ-002",
+      "description": "Isqueiro metálico estilo Zippo gravado à prova de vento e recarregável.",
+      "stock": 10,
+      "category": "ISQUEIROS_MACARICOS",
+      "image": "/assets/products/isqueiro_zippo_recarregavel.png"
+    },
+    {
+      "code": "ISQ-003",
+      "id": "prod-isqueiro-bic-g",
+      "image": "/assets/products/isqueiro_bic_g.png",
+      "category": "ISQUEIROS_MACARICOS",
+      "stock": 40,
+      "description": "Isqueiro tradicional descartável BIC tamanho grande maxi.",
+      "name": "Bic G",
+      "isActive": true,
+      "price": 8.5
+    },
+    {
+      "promoPrice": 6.99,
+      "isActive": true,
+      "description": "Isqueiro grande modelo MAX1 de acendimento suave.",
+      "stock": 25,
+      "code": "ISQ-004",
+      "category": "ISQUEIROS_MACARICOS",
+      "id": "prod-isqueiro-max1-g",
+      "price": 8,
+      "name": "Isqueiro MAX1 G"
+    },
+    {
+      "name": "ISQUEIRO COQUEIRO",
+      "price": 3,
+      "code": "ISQ-005",
+      "stock": 50,
+      "description": "Isqueiro simples e econômico modelo Coqueiro.",
+      "id": "prod-isqueiro-coqueiro",
+      "isActive": true,
+      "category": "ISQUEIROS_MACARICOS"
+    },
+    {
+      "description": "Maçarico tipo pistola recarregável com chama turbo e mecanismo giratório fidget spinner.",
+      "stock": 6,
+      "name": "Maçarico Pistola/fidgetspinner",
+      "category": "ISQUEIROS_MACARICOS",
+      "id": "prod-macarico-pistola-spinner",
+      "promoPrice": 64.99,
+      "price": 70,
+      "code": "ISQ-006",
+      "isActive": true
+    },
+    {
+      "name": "1 Und Tesoura de Metal Garça",
+      "promoPrice": 24.99,
+      "category": "TESOURAS",
+      "stock": 12,
+      "description": "Tesoura clássica de ponta fina e afiação precisa em formato de garça vintage.",
+      "image": "/assets/products/tesoura_metal_garca.png",
+      "id": "prod-tesoura-metal-garca",
+      "price": 35,
+      "code": "TSR-001",
+      "featured": true,
+      "isActive": true
+    },
+    {
+      "price": 22,
+      "name": "1 Und Tesoura Dobrável TO NA BÊ",
+      "description": "Tesourinha dobrável portátil Tô na Bê com cabo emborrachado.",
+      "category": "TESOURAS",
+      "stock": 15,
+      "code": "TSR-002",
+      "isActive": true,
+      "variations": [
+        {
+          "name": "Cor",
+          "options": [
+            "Preto",
+            "Verde",
+            "Laranja",
+            "Rosa"
+          ]
+        }
+      ],
+      "id": "prod-tesoura-dobravel-to-na-be",
+      "image": "/assets/products/tesoura_dobravel_to_na_be.png",
+      "promoPrice": 18
+    },
+    {
+      "id": "prod-tesoura-abduzido-p",
+      "stock": 10,
+      "name": "tesoura ABDUZIDO P",
+      "isActive": true,
+      "code": "TSR-003",
+      "price": 30,
+      "promoPrice": 24.99,
+      "category": "TESOURAS",
+      "description": "Tesoura compacta de corte cirúrgico para fumo linha Abduzido."
+    },
+    {
+      "stock": 8,
+      "category": "TESOURAS",
+      "description": "Tesoura de tamanho grande para preparo de fumo Abduzido.",
+      "name": "tesoura ABDUZIDO G",
+      "promoPrice": 39.99,
+      "isActive": true,
+      "price": 50,
+      "code": "TSR-004",
+      "id": "prod-tesoura-abduzido-g"
+    },
+    {
+      "category": "TESOURAS",
+      "image": "/assets/products/tesoura_dobravel_metal.png",
+      "id": "prod-tesoura-dobravel-metal",
+      "promoPrice": 24.99,
+      "code": "TSR-005",
+      "description": "Tesoura dobrável em metal resistente com pontas retráteis e anéis dourados.",
+      "stock": 14,
+      "isActive": true,
+      "name": "1 Und Tesoura Dobrável Metal",
+      "price": 30
+    },
+    {
+      "description": "Cuia de preparo moldada em cerâmica esmaltada artesanal tamanho médio.",
+      "isActive": true,
+      "price": 80,
+      "name": "Cuia de ceramica M",
+      "stock": 4,
+      "category": "CUIAS_CERAMICA",
+      "promoPrice": 69.99,
+      "code": "CCR-001",
+      "id": "prod-cuia-ceramica-m"
+    },
+    {
+      "id": "prod-cuia-ceramica-p",
+      "category": "CUIAS_CERAMICA",
+      "stock": 4,
+      "promoPrice": 49.99,
+      "name": "Cuia de cerâmica P",
+      "description": "Cuia de cerâmica artesanal tamanho pequeno para preparo fino.",
+      "price": 60,
+      "isActive": true,
+      "code": "CCR-002"
+    },
+    {
+      "price": 18,
+      "variations": [
+        {
+          "name": "Arte",
+          "options": [
+            "Billie/Edgar",
+            "Ruby",
+            "Silver",
+            "Sexy Sadie"
+          ]
+        }
+      ],
+      "description": "Mini latinha porta-objetos metálica com ilustrações dos personagens Lion Rolling Circus.",
+      "category": "HEADSHOP",
+      "promoPrice": 14.99,
+      "name": "1 Und Mini Lata LION ROLLING CIRCUS",
+      "stock": 15,
+      "id": "prod-mini-lata-lion-circus",
+      "code": "HDS-001",
+      "isActive": true,
+      "image": "/assets/products/mini_lata_lion_rolling_circus.png"
+    },
+    {
+      "image": "/assets/products/porta_beck_metal_bem_bolado.png",
+      "isActive": true,
+      "id": "prod-porta-beck-metal-bem-bolado",
+      "variations": [
+        {
+          "name": "Cor",
+          "options": [
+            "Verde Metálico",
+            "Preto Fosco",
+            "Vermelho",
+            "Dourado",
+            "Azul",
+            "Prata"
+          ]
+        }
+      ],
+      "code": "HDS-002",
+      "promoPrice": 21.99,
+      "stock": 20,
+      "category": "HEADSHOP",
       "name": "1 Und Porta Beck Metal BEM BOLADO G",
-      "code": "HEA-002",
+      "price": 25,
+      "description": "Mocó metálico hermético antiodor Bem Bolado tamanho G para proteger seu fumo."
+    },
+    {
+      "price": 10,
+      "category": "HEADSHOP",
+      "name": "1 Und Porta Beck Plástico P",
+      "id": "prod-porta-beck-plastico-p",
+      "variations": [
+        {
+          "options": [
+            "Preto",
+            "Branco",
+            "Vermelho",
+            "Azul",
+            "Verde",
+            "Amarelo",
+            "Rosa"
+          ],
+          "name": "Cor"
+        }
+      ],
+      "stock": 35,
+      "promoPrice": 7.99,
+      "image": "/assets/products/porta_beck_plastico_p.png",
+      "description": "Tubo porta-beck hermético tamanho P resistente à água e odores.",
+      "isActive": true,
+      "code": "HDS-003"
+    },
+    {
+      "price": 75,
+      "name": "Néctar collector",
+      "isActive": true,
+      "stock": 7,
+      "promoPrice": 59.99,
+      "code": "HDS-004",
+      "category": "HEADSHOP",
+      "description": "Aparelho Nectar Collector portátil em silicone com ponta de titânio para óleos e concentrados.",
+      "id": "prod-nectar-collector",
+      "image": "/assets/products/nectar_collector.png"
+    },
+    {
+      "price": 30,
+      "name": "Porta isqueiro anti rato",
+      "isActive": true,
+      "stock": 25,
+      "promoPrice": 24.99,
+      "id": "prod-porta-isqueiro-anti-rato",
+      "code": "HDS-005",
+      "category": "HEADSHOP",
+      "description": "Cordinha retrátil de segurança porta-isqueiro para prender na roupa e nunca mais perder seu isqueiro.",
+      "image": "/assets/products/porta_isqueiro_anti_rato.png"
+    },
+    {
+      "category": "HEADSHOP",
+      "code": "HDS-006",
+      "description": "Acessório cremadouro especial Hash Collector.",
+      "stock": 8,
+      "id": "prod-cremador-hash-collector",
+      "promoPrice": 54.99,
+      "name": "Cremador HASH colector",
+      "isActive": true,
+      "price": 65
+    },
+    {
+      "featured": true,
+      "price": 50,
+      "isActive": true,
+      "name": "1 Und Case Meninas Super Poderosas",
+      "description": "Estojo case rígido anti-impacto com estampa das Meninas Super Poderosas.",
+      "stock": 8,
+      "id": "prod-case-meninas-super-poderosas",
+      "category": "CASES",
+      "code": "CAS-001",
+      "promoPrice": 34.99,
+      "image": "/assets/products/case_meninas_super_poderosas.png"
+    },
+    {
+      "description": "Estojo reforçado anti-impacto Tô na Bê com zíper e divisórias internas.",
+      "category": "CASES",
+      "code": "CAS-002",
+      "price": 50,
+      "id": "prod-case-to-na-be-verde",
+      "image": "/assets/products/case_to_na_be_verde.png",
+      "name": "1 Und Case TO NA BÊ (Verde)",
+      "isActive": true,
+      "stock": 10
+    },
+    {
+      "description": "Estojo rígido Tô na Bê rosa com ilustração psicodélica.",
+      "price": 50,
+      "category": "CASES",
+      "name": "1 Und Case TO NA BÊ (Rosa)",
+      "stock": 10,
+      "image": "/assets/products/case_to_na_be_rosa.png",
+      "isActive": true,
+      "id": "prod-case-to-na-be-rosa",
+      "code": "CAS-003"
+    },
+    {
+      "category": "CASES",
+      "price": 25,
+      "name": "Case em lata disfarçada de cigarro",
+      "stock": 12,
+      "promoPrice": 19.99,
+      "isActive": true,
+      "description": "Case de metal camuflado formato maço de cigarro para discrição total.",
+      "id": "prod-case-lata-cigarro",
+      "image": "/assets/products/case_lata_cigarro.png",
+      "code": "CAS-004"
+    },
+    {
+      "category": "CASES",
+      "id": "prod-case-hello-kitty",
+      "isActive": true,
+      "code": "CAS-005",
+      "name": "Case Hello Kitty",
+      "stock": 6,
+      "price": 50,
+      "description": "Case protetor temático Hello Kitty emborrachado com fecho duplo."
+    },
+    {
+      "isActive": true,
+      "code": "BDJ-001",
+      "price": 25,
+      "description": "Bandeja metálica com bordas arredondadas Bros.",
+      "promoPrice": 16.99,
+      "name": "1 Und Bandeja BROS",
+      "category": "BANDEJAS",
+      "id": "prod-bandeja-bros",
+      "stock": 12
+    },
+    {
+      "name": "1 Und Bandeja MANDALA SADHU",
+      "description": "Bandeja de metal com estampa artística Mandala Sadhu.",
+      "isActive": true,
+      "stock": 10,
+      "promoPrice": 23.99,
+      "id": "prod-bandeja-mandala-sadhu",
+      "price": 33,
+      "code": "BDJ-002",
+      "category": "BANDEJAS"
+    },
+    {
+      "isActive": true,
+      "id": "prod-mini-bandeja-hello-kitty",
+      "stock": 14,
+      "name": "1 Und mini Bandeja Hello Kitty",
+      "description": "Mini bandeja de apoio em metal estampada Hello Kitty.",
+      "image": "/assets/products/mini_bandeja_hello_kitty.png",
+      "price": 20,
+      "promoPrice": 14.99,
+      "code": "BDJ-003",
+      "category": "BANDEJAS"
+    },
+    {
+      "image": "/assets/products/bandeja_honeypuff_vidro.png",
+      "code": "BDJ-004",
+      "promoPrice": 39.99,
+      "id": "prod-bandeja-honeypuff-vidro",
+      "isActive": true,
+      "description": "Bandeja de enrolar em vidro temperado de alta resistência Honeypuff.",
+      "featured": true,
+      "stock": 5,
+      "name": "Bandeja HONEYPUFF vidro resistente",
+      "category": "BANDEJAS",
+      "price": 65
+    },
+    {
+      "id": "prod-bandeja-lion-circus-vidro",
+      "code": "BDJ-005",
+      "price": 70,
+      "isActive": true,
+      "image": "/assets/products/bandeja_lion_circus_vidro.png",
+      "promoPrice": 39.99,
+      "description": "Bandeja premium de vidro reforçado Lion Rolling Circus ilustrada.",
+      "name": "Bandeja LION CIRCUS vidro resistente",
+      "category": "BANDEJAS",
+      "stock": 6
+    },
+    {
+      "name": "1 Und Bong Acrílico",
+      "stock": 8,
+      "isActive": true,
+      "id": "prod-bong-acrilico",
+      "image": "/assets/products/bong_acrilico.png",
+      "promoPrice": 34.99,
+      "price": 47.5,
+      "code": "BNG-001",
+      "category": "BONGS_PIPES",
+      "description": "Bong de acrílico leve e resistente para filtragem na água."
+    },
+    {
+      "image": "/assets/products/bong_silicone_pickle_rick.png",
+      "category": "BONGS_PIPES",
+      "code": "BNG-002",
+      "stock": 10,
+      "id": "prod-bong-silicone-pickle-rick",
+      "description": "Bong dobrável e lavável em silicone temático Pickle Rick com fornilho de vidro.",
+      "variations": [
+        {
+          "options": [
+            "Verde Tradicional",
+            "Azul Tie-Dye",
+            "Verde Neon"
+          ],
+          "name": "Modelo"
+        }
+      ],
+      "promoPrice": 22.99,
+      "isActive": true,
+      "name": "1 Und Bong de Silicone PICKLE RICK",
+      "price": 30
+    },
+    {
+      "description": "Bong em acrílico reforçado Squadafum com bowl metálico.",
+      "promoPrice": 54.99,
+      "code": "BNG-003",
+      "category": "BONGS_PIPES",
+      "id": "prod-bong-acrilico-squadafum",
+      "price": 70,
+      "image": "/assets/products/bong_acrilico_squadafum.png",
+      "name": "BONG de acrílico SQUADAFUM",
+      "isActive": true,
+      "stock": 6
+    },
+    {
+      "stock": 7,
+      "category": "BONGS_PIPES",
+      "name": "BONG de vidro",
+      "image": "/assets/products/bong_de_vidro.png",
+      "isActive": true,
+      "price": 75,
+      "code": "BNG-004",
+      "featured": true,
+      "promoPrice": 59.99,
+      "id": "prod-bong-vidro",
+      "description": "Bong clássico em vidro borossilicato com base beaker para máxima pureza."
+    },
+    {
+      "stock": 5,
+      "isActive": true,
+      "promoPrice": 64.99,
+      "name": "Pipe de vidro ULTRA420",
+      "description": "Pipe artesanal de vidro borossilicato Ultra420 de fácil higienização.",
+      "price": 100,
+      "category": "BONGS_PIPES",
+      "code": "BNG-005",
+      "id": "prod-pipe-vidro-ultra420"
+    },
+    {
+      "image": "/assets/products/tabaco_amsterdam_25g.png",
+      "promoPrice": 20.99,
+      "featured": true,
       "stock": 25,
       "isActive": true,
-      "id": "porta-beck-metal-bb",
-      "category": "HEADSHOP"
+      "code": "TAB-001",
+      "description": "Tabaco Virgínia suave orgânico Amsterdam, picado finamente, embalagem 25g.",
+      "category": "TABACO_KUMBAYA",
+      "name": "1 Und Tabaco AMSTERDAM - 25g",
+      "price": 22,
+      "id": "prod-tabaco-amsterdam-25g"
     },
     {
-      "code": "TAB-001",
+      "code": "TAB-002",
+      "description": "Tabaco desfiado Tá Na Mão com zip lock e adesivo personalizado 25g.",
+      "id": "prod-tabaco-tanamao-25g",
       "category": "TABACO_KUMBAYA",
       "price": 22,
-      "stock": 45,
-      "id": "tabaco-amsterdam",
-      "name": "1 Und Tabaco AMSTERDAM - 25g",
-      "isActive": true,
-      "description": "Tabaco Amsterdam extra suave, livre de aditivos químicos. Fios longos e fáceis de enrolar."
+      "name": "1 Und Tabaco TANAMÃO c adesivo - 25g",
+      "image": "/assets/products/tabaco_tanamao_25g.png",
+      "promoPrice": 20.99,
+      "stock": 20,
+      "isActive": true
     },
     {
+      "price": 20,
       "name": "Kumbaya com Tabaco SASSO - 25g",
-      "description": "Blend especial de Kumbaya (ervas naturais) selecionadas harmonizado com o melhor tabaco suave Sasso.",
+      "id": "prod-kumbaya-com-tabaco-sasso",
+      "description": "Blend aromático de ervas selecionadas combinadas com tabaco nobre Sasso 25g.",
+      "category": "TABACO_KUMBAYA",
+      "stock": 18,
+      "image": "/assets/products/kumbaya_com_tabaco_sasso.png",
+      "isActive": true,
+      "code": "TAB-003"
+    },
+    {
+      "description": "Mistura 100% de flores e ervas naturais kumbaya sem nicotina Sasso 25g.",
+      "category": "TABACO_KUMBAYA",
+      "price": 20,
+      "name": "Kumbaya SASSO - 25g",
+      "id": "prod-kumbaya-sasso-25g",
+      "isActive": true,
+      "stock": 18,
+      "image": "/assets/products/kumbaya_sasso.png",
+      "code": "TAB-004"
+    },
+    {
+      "stock": 22,
+      "description": "Tabaco artesanal original da Chapada Diamantina Bahia 25g.",
+      "name": "Tabaco da chapada 25g",
+      "image": "/assets/products/tabaco_da_chapada_25g.png",
+      "id": "prod-tabaco-chapada-25g",
+      "promoPrice": 18.99,
+      "isActive": true,
       "price": 20,
       "category": "TABACO_KUMBAYA",
-      "stock": 15,
-      "id": "kumbaya-tabaco-sasso",
+      "code": "TAB-005"
+    },
+    {
+      "name": "1 Und Tabaco SASSO gold - 25g",
+      "stock": 20,
+      "category": "TABACO_KUMBAYA",
+      "image": "/assets/products/tabaco_sasso_gold_25g.png",
+      "id": "prod-tabaco-sasso-gold-25g",
+      "price": 25,
       "isActive": true,
-      "code": "TAB-002"
+      "code": "TAB-006",
+      "featured": true,
+      "description": "Tabaco premium Sasso linha Gold Virgínia Gold pacote dourado 25g."
+    },
+    {
+      "stock": 15,
+      "isActive": true,
+      "name": "1 Und Bolador HIMALAYA SPLIFF G",
+      "image": "/assets/products/bolador_himalaya_spliff_g.png",
+      "price": 22.5,
+      "code": "BLD-001",
+      "category": "BOLADORES",
+      "id": "prod-bolador-himalaya-spliff-g",
+      "description": "Máquina boladora automática em acrílico tamanho King Size Himalaya.",
+      "promoPrice": 11.99
+    },
+    {
+      "stock": 14,
+      "category": "BOLADORES",
+      "name": "1 Und Bolador LION ROLLING CIRCUS P",
+      "image": "/assets/products/bolador_lion_circus_p.png",
+      "id": "prod-bolador-lion-circus-p",
+      "description": "Bolador manual Lion Rolling Circus tamanho pequeno 78mm.",
+      "variations": [
+        {
+          "name": "Personagem",
+          "options": [
+            "Edgar",
+            "Ruby",
+            "Silver",
+            "Trampoline",
+            "Sadie"
+          ]
+        }
+      ],
+      "price": 18,
+      "promoPrice": 13.99,
+      "code": "BLD-002",
+      "isActive": true
+    },
+    {
+      "category": "BOLADORES",
+      "price": 22,
+      "id": "prod-bolador-sadhu-g",
+      "name": "1 Und Bolador SADHU G",
+      "isActive": true,
+      "stock": 16,
+      "image": "/assets/products/bolador_sadhu_g.png",
+      "code": "BLD-003",
+      "promoPrice": 11.99,
+      "description": "Bolador tradicional 110mm Sadhu King Size para enrolar perfeitamente."
+    },
+    {
+      "code": "BLD-004",
+      "price": 18,
+      "category": "BOLADORES",
+      "id": "prod-bolador-hi-tobacco-mini",
+      "name": "Bolador HI TOBACCO mini size",
+      "image": "/assets/products/bolador_hi_tobacco_mini.png",
+      "stock": 12,
+      "description": "Bolador resistente Hi Tobacco tamanho mini 70mm.",
+      "isActive": true,
+      "promoPrice": 14.99
+    },
+    {
+      "code": "BLD-005",
+      "price": 20,
+      "isActive": true,
+      "id": "prod-bolador-lion-circus-ks",
+      "description": "Bolador 110mm King Size Lion Rolling Circus estampas variadas.",
+      "name": "Bolador LION CIRCUS King size",
+      "promoPrice": 13.99,
+      "variations": [
+        {
+          "name": "Personagem",
+          "options": [
+            "Edgar (Verde)",
+            "Ruby (Rosa)",
+            "Silver (Prata)",
+            "Trampoline (Amarelo)",
+            "Sadie (Azul)"
+          ]
+        }
+      ],
+      "category": "BOLADORES",
+      "stock": 15
+    },
+    {
+      "isActive": true,
+      "code": "BLD-006",
+      "price": 30,
+      "promoPrice": 19.99,
+      "description": "O renomado bolador metálico Smoking King Size 110mm com lona reforçada.",
+      "category": "BOLADORES",
+      "id": "prod-bolador-smoking-ks",
+      "stock": 10,
+      "name": "Bolador SMOKING King size"
+    },
+    {
+      "variations": [
+        {
+          "name": "Cor",
+          "options": [
+            "Verde Neon",
+            "Preto",
+            "Azul",
+            "Vermelho"
+          ]
+        }
+      ],
+      "promoPrice": 11.99,
+      "price": 15,
+      "isActive": true,
+      "description": "Cinzeiro copo automotivo antiodor e corta-chamas para porta-copos.",
+      "name": "1 Und Cinzeiro Carro",
+      "id": "prod-cinzeiro-carro",
+      "stock": 20,
+      "image": "/assets/products/cinzeiro_carro.png",
+      "code": "CNZ-001",
+      "category": "CINZEIROS"
+    },
+    {
+      "price": 35,
+      "id": "prod-cinzeiro-vidro-rick-morty",
+      "name": "1 Und Cinzeiro de Vidro RICK & MORTY",
+      "variations": [
+        {
+          "options": [
+            "Festa Espacial",
+            "Portal Verde"
+          ],
+          "name": "Modelo"
+        }
+      ],
+      "category": "CINZEIROS",
+      "promoPrice": 24.99,
+      "stock": 8,
+      "image": "/assets/products/cinzeiro_vidro_rick_morty.png",
+      "code": "CNZ-002",
+      "isActive": true,
+      "description": "Cinzeiro pesado de vidro maciço com estampa Rick and Morty."
+    },
+    {
+      "code": "CNZ-003",
+      "image": "/assets/products/cinzeiro_vidro_to_na_be.png",
+      "stock": 12,
+      "isActive": true,
+      "name": "1 Und Cinzeiro de Vidro TO NA BÊ",
+      "promoPrice": 24.99,
+      "price": 35,
+      "category": "CINZEIROS",
+      "description": "Cinzeiro redondo em vidro espesso Tô na Bê com 4 descansos de cigarro.",
+      "id": "prod-cinzeiro-vidro-to-na-be",
+      "variations": [
+        {
+          "name": "Arte",
+          "options": [
+            "Hype Azul",
+            "Psicodélico",
+            "Caveira",
+            "Alien",
+            "Olho Místico",
+            "Grafite"
+          ]
+        }
+      ]
+    },
+    {
+      "code": "CNZ-004",
+      "promoPrice": 29.99,
+      "isActive": true,
+      "price": 40,
+      "id": "prod-cinzeiro-metal-giratorio-g",
+      "category": "CINZEIROS",
+      "description": "Cinzeiro fechado giratório com botão de pressão rotativo tamanho G, bloqueia cinzas e odores.",
+      "image": "/assets/products/cinzeiro_metal_giratorio_g.png",
+      "name": "1 Und Cinzeiro Metal giratório - Tamanho G",
+      "stock": 7
+    },
+    {
+      "category": "CINZEIROS",
+      "price": 35,
+      "name": "1 Und Cinzeiro Metal giratório - Tamanho P",
+      "id": "prod-cinzeiro-metal-giratorio-p",
+      "description": "Cinzeiro giratório de metal fechado tamanho P antiodor.",
+      "stock": 9,
+      "isActive": true,
+      "image": "/assets/products/cinzeiro_metal_giratorio_p.png",
+      "code": "CNZ-005",
+      "promoPrice": 26.99
+    },
+    {
+      "code": "CNZ-006",
+      "promoPrice": 11.99,
+      "id": "prod-cinzeiro-prato",
+      "category": "CINZEIROS",
+      "description": "Cinzeiro clássico formato prato de fácil limpeza.",
+      "price": 15,
+      "isActive": true,
+      "name": "1 Und Cinzeiro Prato",
+      "image": "/assets/products/cinzeiro_prato.png",
+      "stock": 15
+    },
+    {
+      "description": "Bolsa transversal Shoulder Bag Puff Life original em lona impermeável com compartimento secreto antifurto.",
+      "isActive": true,
+      "promoPrice": 109.99,
+      "featured": true,
+      "price": 125,
+      "name": "shoulder bag PUFF com bolso escondido",
+      "id": "prod-shoulder-bag-puff",
+      "stock": 5,
+      "category": "SHOULDER_BAG",
+      "image": "/assets/products/shoulder_bag_puff.png",
+      "code": "SHB-001"
+    },
+    {
+      "category": "SHOULDER_BAG",
+      "code": "SHB-002",
+      "promoPrice": 79.99,
+      "stock": 6,
+      "id": "prod-shoulder-bag-tonabe",
+      "isActive": true,
+      "name": "Shoulder Bag TONABÊ",
+      "description": "Shoulder bag estilosa Tô na Bê com alça regulável e bolsos organizadores.",
+      "price": 100
     }
   ],
   "categories": [
     {
-      "name": "KITS COMPLETOS",
       "order": 1,
+      "name": "KITS COMPLETOS",
       "id": "KITS_COMPLETOS"
     },
     {
-      "id": "SEDA_BLUNTS",
       "order": 2,
-      "name": "SEDA/BLUNTS"
+      "name": "FILTROS",
+      "id": "FILTROS"
     },
     {
-      "id": "PITEIRAS_VIDRO",
+      "order": 3,
+      "name": "SEDA/BLUNTS",
+      "id": "SEDA_BLUNTS"
+    },
+    {
       "name": "PITEIRAS DE VIDRO",
-      "order": 3
+      "id": "PITEIRAS_VIDRO",
+      "order": 4
     },
     {
+      "name": "DICHAVADORES",
       "id": "DICHAVADORES",
-      "order": 4,
-      "name": "DICHAVADORES"
+      "order": 5
     },
     {
-      "id": "PITEIRA_FILTRO",
-      "order": 5,
-      "name": "PITEIRA/FILTRO"
+      "order": 6,
+      "id": "PITEIRAS_PAPEL",
+      "name": "PITEIRAS DE PAPEL"
     },
     {
       "id": "SLICKS",
       "name": "SLICKS",
-      "order": 6
-    },
-    {
-      "id": "CUIAS",
-      "order": 7,
-      "name": "CUIAS"
+      "order": 7
     },
     {
       "order": 8,
+      "id": "CUIAS",
+      "name": "CUIAS"
+    },
+    {
       "name": "ISQUEIROS/MAÇARICOS",
+      "order": 9,
       "id": "ISQUEIROS_MACARICOS"
     },
     {
-      "id": "TESOURAS",
       "name": "TESOURAS",
-      "order": 9
-    },
-    {
-      "id": "CUIAS_CERAMICA",
       "order": 10,
-      "name": "CUIAS DE CERÂMICA"
+      "id": "TESOURAS"
     },
     {
-      "order": 11,
+      "name": "CUIAS DE CERÂMICA",
+      "id": "CUIAS_CERAMICA",
+      "order": 11
+    },
+    {
+      "order": 12,
       "id": "HEADSHOP",
       "name": "HEADSHOP"
     },
     {
-      "order": 12,
+      "name": "CASES",
       "id": "CASES",
-      "name": "CASES"
-    },
-    {
-      "name": "BANDEJAS",
-      "id": "BANDEJAS",
       "order": 13
     },
     {
-      "id": "BONGS_PIPES",
+      "id": "BANDEJAS",
       "order": 14,
-      "name": "BONGS/PIPES"
+      "name": "BANDEJAS"
     },
     {
-      "name": "T4BAC0 0RG / KUMBAYA",
+      "name": "BONGS/PIPES",
       "order": 15,
-      "id": "TABACO_KUMBAYA"
+      "id": "BONGS_PIPES"
     },
     {
-      "id": "BOLADORES",
       "order": 16,
-      "name": "BOLADORES"
+      "id": "TABACO_KUMBAYA",
+      "name": "T4BACO ORG / KUMBAYA"
     },
     {
-      "id": "CINZEIROS",
+      "name": "BOLADORES",
       "order": 17,
-      "name": "CINZEIROS"
+      "id": "BOLADORES"
     },
     {
-      "name": "zz",
+      "name": "CINZEIROS",
       "order": 18,
-      "id": "ZZ"
+      "id": "CINZEIROS"
+    },
+    {
+      "id": "SHOULDER_BAG",
+      "order": 19,
+      "name": "SHOULDER BAG"
+    },
+    {
+      "id": "OUTROS",
+      "order": 20,
+      "name": "OUTROS"
     }
   ],
   "settings": {
-    "pickupTime": "24 horas",
-    "phone": "+55 71 9264-4345",
-    "whatsappMessageTemplate": "Olá TabasGestion! Gostaria de fazer o seguinte pedido:",
-    "deliveryFee": 10,
+    "phone": "+55 71 988049892",
     "instagram": "@tabasgestion",
     "storeName": "TabasGestion",
-    "address": "Rua Doutor Augusto Lopes Pontes 455, Salvador - BA"
+    "pickupTime": "24 horas",
+    "deliveryFee": 10,
+    "vipGroupUrl": "https://chat.whatsapp.com/I38enKB1mtzKN1yxNLuzZV?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAcGRvZgJzcnRjBmFwcF9pZA85MzY2MTk3NDMzOTI0NTkAAaeANudPlmE3P-wSV0SRjpLfqMxg0w6ekmZEKRuQugpoWQ0JM7UbEsDlCgflcw_aem_9aoKn118zHWAejZ0Bi4wrA",
+    "address": "Rua Doutor Augusto Lopes Pontes 455, Salvador - BA",
+    "whatsappMessageTemplate": "Olá TabasGestion! Gostaria de fazer o seguinte pedido:",
+    "logoUrl": "data:image/jpeg;base64,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"
   },
   "passcode": "20132013",
-  "orders": [],
-  "updatedAt": "2026-11-05T22:40:04.823Z"
+  "orders": [
+    {
+      "clientName": "Haha",
+      "address": "",
+      "status": "completed",
+      "total": 9.99,
+      "observation": "Ahay",
+      "items": [
+        {
+          "selectedVariations": [
+            {
+              "name": "Tamanho",
+              "value": "M (18mm)"
+            }
+          ],
+          "productId": "anel-f1-sadhu",
+          "quantity": 1,
+          "productName": "1 Und Anel F1 SADHU",
+          "price": 9.99
+        }
+      ],
+      "id": "TAB-802779",
+      "subtotal": 9.99,
+      "deliveryFee": 0,
+      "deliveryType": "pickup",
+      "createdAt": "2026-11-06T15:31:16.400Z",
+      "clientPhone": "2121",
+      "paymentMethod": "A combinar"
+    },
+    {
+      "items": [
+        {
+          "quantity": 1,
+          "price": 90,
+          "productId": "kit-laranja-hippster",
+          "productName": "KIT LARANJA Case HIPPSTER CLUB - COMPLETO",
+          "selectedVariations": []
+        }
+      ],
+      "observation": "",
+      "deliveryFee": 0,
+      "deliveryType": "pickup",
+      "clientPhone": "75988055500",
+      "createdAt": "2026-11-06T00:20:37.830Z",
+      "subtotal": 90,
+      "paymentMethod": "A combinar",
+      "status": "completed",
+      "id": "TAB-858829",
+      "clientName": "Maria dos Santos",
+      "address": "",
+      "total": 90
+    },
+    {
+      "deliveryType": "pickup",
+      "clientPhone": "7158",
+      "total": 90,
+      "observation": "Yyy",
+      "paymentMethod": "A combinar",
+      "status": "completed",
+      "address": "",
+      "deliveryFee": 0,
+      "subtotal": 90,
+      "clientName": "Renato Queiroz ",
+      "createdAt": "2026-11-05T23:33:37.833Z",
+      "id": "TAB-718001",
+      "items": [
+        {
+          "productName": "KIT LARANJA Case HIPPSTER CLUB - COMPLETO",
+          "selectedVariations": [],
+          "productId": "kit-laranja-hippster",
+          "price": 90,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "createdAt": "2026-11-05T23:28:54.799Z",
+      "clientName": "asas",
+      "clientPhone": "asas",
+      "deliveryFee": 0,
+      "total": 90,
+      "address": "",
+      "observation": "asas",
+      "subtotal": 90,
+      "deliveryType": "pickup",
+      "status": "completed",
+      "items": [
+        {
+          "productName": "KIT LARANJA Case HIPPSTER CLUB - COMPLETO",
+          "price": 90,
+          "quantity": 1,
+          "productId": "kit-laranja-hippster",
+          "selectedVariations": []
+        }
+      ],
+      "id": "TAB-795659",
+      "paymentMethod": "A combinar"
+    },
+    {
+      "createdAt": "2026-11-05T23:24:36.791Z",
+      "deliveryType": "pickup",
+      "clientPhone": "asas",
+      "clientName": "sas",
+      "observation": "asas",
+      "total": 90,
+      "deliveryFee": 0,
+      "status": "completed",
+      "id": "TAB-180820",
+      "items": [
+        {
+          "productId": "kit-laranja-hippster",
+          "productName": "KIT LARANJA Case HIPPSTER CLUB - COMPLETO",
+          "selectedVariations": [],
+          "quantity": 1,
+          "price": 90
+        }
+      ],
+      "paymentMethod": "A combinar",
+      "address": "",
+      "subtotal": 90
+    },
+    {
+      "deliveryFee": 0,
+      "createdAt": "2026-11-05T23:21:11.259Z",
+      "deliveryType": "pickup",
+      "observation": "sas",
+      "id": "TAB-707678",
+      "status": "completed",
+      "total": 90,
+      "clientPhone": "71988049892",
+      "clientName": "rafael",
+      "items": [
+        {
+          "productId": "kit-laranja-hippster",
+          "productName": "KIT LARANJA Case HIPPSTER CLUB - COMPLETO",
+          "selectedVariations": [],
+          "quantity": 1,
+          "price": 90
+        }
+      ],
+      "subtotal": 90,
+      "paymentMethod": "A combinar",
+      "address": ""
+    }
+  ],
+  "updatedAt": "2026-11-07T14:12:24.307Z"
 }

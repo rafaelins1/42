@@ -1,6 +1,6 @@
 {
-  "summary":  "Plano de implementação para ocultar e proteger o Painel do Gestor da visualização dos clientes. Inclui remoção do botão do cabeçalho, ativação por toque secreto no logo (5 cliques rápidos) ou parâmetro de URL (?admin=true), proteção com PIN configurável diretamente nas configurações e bloqueio temporário contra tentativas incorretas.",
-  "updatedAt":  "2026-11-07T13:58:04.124896473Z",
+  "summary":  "Plano para importação e substituição dos produtos de exemplo pelos produtos e fotos reais da TabasGestion a partir dos prints e fotos enviados pelo lojista, sincronizando-os em tempo real com o banco de dados em nuvem.",
+  "updatedAt":  "2026-11-07T15:45:55.868190124Z",
   "requestFeedback":  true,
   "userFacing":  true
 }
