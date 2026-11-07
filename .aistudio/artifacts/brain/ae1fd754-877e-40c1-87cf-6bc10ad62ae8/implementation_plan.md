@@ -1,100 +1,88 @@
-# Integração Firebase Firestore para Persistência e Sincronização em Nuvem (TabasGestion)
+# Ocultação e Proteção Avançada do Painel do Gestor
 
-Plano de arquitetura e implementação para provisionar e conectar o Google Cloud Firestore ao aplicativo, garantindo que todas as alterações feitas no catálogo, preços, estoque, pedidos recebidos e painel administrativo fiquem salvas permanentemente e sincronizadas em tempo real na web.
+Plano de segurança para ocultar o acesso administrativo de clientes comuns e reforçar a proteção com PIN numérico configurável e métodos de entrada secretos.
+
+### User Review & Critical Decisions
 
 > [!IMPORTANT]
-> **Decisões Confirmadas pelo Usuário:**
-> - **Banco de Dados Selecionado:** Firebase Firestore nativo integrado diretamente na plataforma.
-> - **Escopo de Sincronização:** Total — produtos, categorias, configurações da loja, pedidos de clientes e senha de acesso do admin.
-> - **Aprovação de Termos do Firebase:** Na etapa de execução, o assistente acionará o modal oficial do Firebase para confirmação única da criação do banco.
+> Decisões confirmadas pelo usuário na etapa de alinhamento:
+> - **Acesso Oculto**: Remover o botão "Painel do Gestor" do cabeçalho visível aos clientes. O acesso será realizado por toque secreto (5 toques no logotipo) e por parâmetro direto na URL (`?admin=true`).
+> - **Segurança**: Autenticação por PIN numérico, com gerenciamento e alteração do código diretamente na aba de Configurações do painel administrativo.
 
 ---
 
-## 1. Visão Geral e Conceito
+### 1. Overview & Core Concept
 
-- **Problema Atual:** O sistema estava operando em modo de armazenamento local em arquivo temporário (`db.json` e `localStorage`), o que impedia que alterações feitas na área administrativa ficassem salvas na nuvem ou fossem visíveis por clientes em outros navegadores e celulares.
-- **Solução:** Integrar o Google Cloud Firestore via SDK oficial (`@google-cloud/firestore` e Firebase Client/Server), permitindo leitura e gravação em nuvem com alta disponibilidade, latência mínima e sincronização em tempo real.
-- **Público e Casos de Uso:**
-  - **Clientes:** Acessam o catálogo web atualizado em tempo real, visualizam produtos com preços e disponibilidade corretos e enviam pedidos.
-  - **Lojista/Administrador:** Gerencia produtos, altera preços, cria categorias, acompanha pedidos em tempo real e customiza configurações da loja a partir de qualquer dispositivo conectado à internet.
+- **O que faz**: Transforma o catálogo em uma vitrine 100% voltada ao consumidor final, sem botões de gestão visíveis que despertem curiosidade ou tentativas de invasão por clientes.
+- **Público-alvo**: O lojista/administrador da TabasGestion terá acesso exclusivo e discreto, enquanto os clientes finais visualizam apenas a loja virtual limpa e o atendimento WhatsApp.
+- **Principal Valor**: Discrição total da área administrativa e segurança simples e eficaz sem necessidade de login complexo por e-mail a cada visita no celular.
 
 ---
 
-## 2. Experiência do Usuário e Design Visual
+### 2. User Experience & Visual Design
 
-- **Fluxo do Administrador:**
-  1. Acessa a Área Restrita digitando a senha (armazenada e validada com o banco em nuvem).
-  2. Ao editar um produto, criar categoria ou alterar o WhatsApp/PIX da loja, um indicador sutil e elegante mostra "Sincronizado na Nuvem (Firestore)" com status verde ativo.
-  3. Ao receber um novo pedido de cliente, a lista de pedidos é atualizada instantaneamente sem necessidade de recarregar a página manualmente.
-- **Fluxo do Cliente:**
-  1. Abre o catálogo no celular ou computador e sempre recebe a versão mais recente do estoque e promoções.
-  2. Adiciona itens ao carrinho e finaliza via WhatsApp, gerando o pedido salvo com ID único no Firestore.
-- **Direção Visual:**
-  - Manter a estética premium de tabacaria/lounge: tons escuros neutros (`neutral-950`, `neutral-900`), acentos em âmbar e dourado refinado (`amber-500`, `amber-600`), tipografia nítida e sem excessos de pills estáticos.
-
----
-
-## 3. Decisões de Produto e Arquitetura
-
-- **Decisão 1: Arquitetura de Sincronização Híbrida (Server-side + Fallback Seguro)**
-  - *Abordagem:* O backend Express (`server.ts` e `database-adapter.ts`) atua como camada de persistência robusta alimentando os endpoints REST já consumidos pelo frontend (`/api/db`, `/api/db/products`, etc.) com conexão direta ao Firestore. Adicionalmente, quando o Firestore estiver ativo, os dados são lidos diretamente da nuvem, eliminando a dependência do disco temporário local.
-  - *Vantagem:* Compatibilidade total com as telas e formulários existentes, zero risco de quebra de componentes e facilidade de deploy tanto no ambiente AI Studio quanto na Vercel/Cloud Run.
-- **Decisão 2: Modelo de Dados no Firestore**
-  - Coleção principal `tabas_store` com o documento `main_store` contendo os dados mestre:
-    - `products`: Lista de produtos com IDs, títulos, preços, descrições, imagens e status ativo.
-    - `categories`: Lista ordenada de categorias.
-    - `settings`: Configurações da loja (WhatsApp, chave Pix, taxa de entrega, horário de atendimento).
-    - `passcode`: Senha numérica do painel do lojista.
-    - `orders`: Histórico dos pedidos realizados.
-  - Sub-coleções para histórico detalhado de pedidos (`tabas_orders`) para escalabilidade futura caso o volume cresça.
+- **Experiência do Cliente Comum**:
+  - O cabeçalho exibe apenas a identidade da marca, o botão do Grupo VIP, o resumo do carrinho e a busca/categorias.
+  - Zero menções a "Painel", "Gestor", "Admin" ou ícones de cadeado na interface pública.
+- **Fluxos Secretos de Acesso do Gestor**:
+  1. **Toque Secreto no Logotipo**:
+     - Clicar/tocar 5 vezes seguidas no logotipo da loja em um intervalo de até 2,5 segundos.
+     - Ao completar a sequência, o modal de autenticação por PIN é aberto suavemente com animação de cofre seguro.
+  2. **Acesso Direto por URL (`?admin=true` ou `#admin`)**:
+     - O lojista pode salvar nos favoritos do celular ou navegador o link `https://seusite.com/?admin=true`. Ao abrir esse link, o modal de PIN aparece imediatamente.
+  3. **Acesso Discreto no Rodapé**:
+     - Um link minimalista no rodapé (texto discreto sem destaque visual) como rota alternativa de emergência.
+- **Modal de Autenticação por PIN**:
+  - Visual escuro minimalista (`bg-neutral-900 border-neutral-800`) com 4 a 6 marcadores de dígitos (bolinhas que acendem conforme digitado).
+  - Teclado numérico virtual integrado (botões 0-9, apagar e limpar) ideal para uso rápido no celular com uma mão.
+  - Alerta de erro com animação de vibração visual caso o PIN esteja incorreto.
+  - **Proteção contra Força Bruta**: Após 5 tentativas incorretas consecutivas, o sistema trava novas tentativas por 30 segundos com contagem regressiva em tempo real.
+- **Gestão do PIN no Painel**:
+  - Nova seção na aba **Configurações**: campo "Alterar PIN de Acesso" com opção de visualizar/ocultar senha e botão de salvar.
+  - O PIN é sincronizado e salvo de forma persistente nas configurações da loja.
 
 ---
 
-## 4. Arquitetura Técnica e Fluxo de Dados
+### 3. Key Product Decisions & Trade-Offs
+
+- **Remoção Completa do Topo**:
+  - *Abordagem*: Eliminar o botão `id="btn-goto-manager"` da barra superior.
+  - *Por quê*: Impede que qualquer cliente descubra ou tente interagir com o painel administrativo.
+  - *Alternativa descartada*: Deixar um ícone discreto no topo ainda atrairia cliques de curiosos no celular.
+- **Toque Múltiplo no Logo (5 Toques) + URL**:
+  - *Abordagem*: Detector de cliques com timestamp que zera automaticamente se o intervalo entre cliques for maior que 600ms.
+  - *Por quê*: É um padrão clássico e ergonômico de "Easter Egg" administrativo em aplicativos móveis e totens de autoatendimento, impossível de ser acionado por acidente por um cliente comum.
+
+---
+
+### 4. Technical Architecture & Component Interaction
 
 ```
-┌───────────────────────────────────────────────────────────────┐
-│                    Navegadores Clientes & Admin                │
-│   (CatalogView · Modal de Pedidos · AdminDashboard · Gate)     │
-└───────────────────────────────┬───────────────────────────────┘
-                                │ Fetch / REST API
-                                ▼
-┌───────────────────────────────────────────────────────────────┐
-│                       Express API Server                      │
-│   GET  /api/db                POST /api/db/products           │
-│   POST /api/db/categories     POST /api/db/settings           │
-│   POST /api/db/orders/add     GET  /api/db/sync-status        │
-└───────────────────────────────┬───────────────────────────────┘
-                                │
-                                ▼
-┌───────────────────────────────────────────────────────────────┐
-│              database-adapter.ts (Provedor Firestore)         │
-│  - Inicialização com credenciais seguras de serviço           │
-│  - Cache inteligente em memória para resposta ultra-rápida    │
-│  - Fallback automático caso esteja offline                    │
-└───────────────────────────────┬───────────────────────────────┘
-                                │ Google Cloud SDK
-                                ▼
-┌───────────────────────────────────────────────────────────────┐
-│                 Google Cloud Firestore (Nuvem)                │
-│           Coleção: tabas_store / Documento: main_store        │
-│           Coleção: orders (Pedidos em tempo real)             │
-└───────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    Catálogo TabasGestion                    │
+│                                                             │
+│  [Logo (5 toques)] ───► Detector de Sequência              │
+│                                │                            │
+│  [URL ?admin=true] ───► Leitura de SearchParams             │
+│                                │                            │
+│                                ▼                            │
+│                 ┌─────────────────────────────┐             │
+│                 │  Modal de Autenticação PIN  │             │
+│                 │  - Teclado numérico virtual │             │
+│                 │  - 5 tentativas máx (30s)   │             │
+│                 └──────────────┬──────────────┘             │
+│                                │ PIN Correto                │
+│                                ▼                            │
+│                 ┌─────────────────────────────┐             │
+│                 │      Painel do Gestor       │             │
+│                 │  - Pedidos & Estoque        │             │
+│                 │  - Configurações (Novo PIN) │             │
+│                 │  - Botão de Sair (Logout)   │             │
+│                 └─────────────────────────────┘             │
+└─────────────────────────────────────────────────────────────┘
 ```
 
----
-
-## 5. Roteiro de Execução (Após Aprovação)
-
-1. **Provisionamento do Firebase:**
-   - Acionar `show_aistudio_ui` para confirmação dos termos pelo usuário.
-   - Executar `ProvisionFirebase` via RPC para criar a instância Firestore dedicada do projeto.
-2. **Configuração de Regras e Blueprint:**
-   - Gerar `firebase-blueprint.json` e aplicar regras de segurança com `firestore.rules`.
-3. **Conexão no Adaptador de Banco de Dados:**
-   - Atualizar `database-adapter.ts` e `server.ts` para carregar a configuração automática do `firebase-applet-config.json`.
-   - Garantir migração suave: se o Firestore estiver vazio no primeiro boot, semear automaticamente os dados iniciais do catálogo para nunca deixar a loja vazia.
-4. **Verificação e Testes:**
-   - Testar gravação de produtos e alteração de preços na Área Restrita.
-   - Testar envio de pedidos a partir do carrinho do cliente.
-   - Validar compilação (`compile_applet`) e linter (`lint_applet`).
+- **Estado de Sessão Administrativa**:
+  - Salva flag temporária na sessão (`sessionStorage.setItem('tabas_admin_auth', 'true')`) para que o lojista não precise digitar o PIN repetidamente enquanto estiver usando o painel na mesma sessão, com botão explícito de "Sair" para encerrar a sessão imediatamente.
+- **Sincronização do PIN**:
+  - Salvo na entidade `StoreSettings.adminPin` que já sincroniza com o banco em nuvem (Firestore) e armazenamento local.

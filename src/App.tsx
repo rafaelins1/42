@@ -22,6 +22,23 @@ export default function App() {
   // Routing state: 'catalog' | 'admin_gate' | 'admin_dashboard'
   const [currentScreen, setCurrentScreen] = useState<'catalog' | 'admin_gate' | 'admin_dashboard'>('catalog');
 
+  // Detect ?admin=true or #admin in URL to open admin portal directly
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('admin') === 'true' || window.location.hash === '#admin') {
+        const isAuth = sessionStorage.getItem('tabas_admin_auth') === 'true';
+        setCurrentScreen(isAuth ? 'admin_dashboard' : 'admin_gate');
+
+        // Clean the address bar gracefully
+        const cleanUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+      }
+    } catch (e) {
+      console.warn('URL check skipped:', e);
+    }
+  }, []);
+
   // Real-time Firestore sync across all open clients & devices
   useEffect(() => {
     const unsubscribe = subscribeToStoreData((cloudData) => {
@@ -187,14 +204,20 @@ export default function App() {
           products={products}
           categories={categories}
           settings={settings}
-          onEnterAdmin={() => setCurrentScreen('admin_gate')}
+          onEnterAdmin={() => {
+            const isAuth = sessionStorage.getItem('tabas_admin_auth') === 'true';
+            setCurrentScreen(isAuth ? 'admin_dashboard' : 'admin_gate');
+          }}
           onAddOrder={handleAddOrder}
         />
       )}
 
       {currentScreen === 'admin_gate' && (
         <PasscodeGate
-          onSuccess={() => setCurrentScreen('admin_dashboard')}
+          onSuccess={() => {
+            sessionStorage.setItem('tabas_admin_auth', 'true');
+            setCurrentScreen('admin_dashboard');
+          }}
           onCancel={() => setCurrentScreen('catalog')}
           correctPasscode={passcode}
         />
@@ -212,7 +235,10 @@ export default function App() {
           onUpdateSettings={handleUpdateSettings}
           onUpdateOrders={handleUpdateOrders}
           onUpdatePasscode={handleUpdatePasscode}
-          onExit={() => setCurrentScreen('catalog')}
+          onExit={() => {
+            sessionStorage.removeItem('tabas_admin_auth');
+            setCurrentScreen('catalog');
+          }}
         />
       )}
     </div>

@@ -1,6 +1,6 @@
 {
-  "summary": "Plano de implementação detalhado para integração completa do Firebase Firestore na nuvem do TabasGestion, permitindo sincronização em tempo real e persistência permanente de produtos, categorias, pedidos, configurações da loja e senha administrativa na web.",
-  "updatedAt": "2026-11-05T18:31:17.129510245Z",
-  "requestFeedback": true,
-  "userFacing": true
+  "summary":  "Plano de implementação para ocultar e proteger o Painel do Gestor da visualização dos clientes. Inclui remoção do botão do cabeçalho, ativação por toque secreto no logo (5 cliques rápidos) ou parâmetro de URL (?admin=true), proteção com PIN configurável diretamente nas configurações e bloqueio temporário contra tentativas incorretas.",
+  "updatedAt":  "2026-11-07T13:58:04.124896473Z",
+  "requestFeedback":  true,
+  "userFacing":  true
 }

@@ -138,8 +138,8 @@ export default function AdminDashboard({
 
   const handleUpdatePIN = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newPIN.length !== 8 || !/^\d+$/.test(newPIN)) {
-      setPinMessage({ text: 'O PIN deve conter exatamente 8 números!', error: true });
+    if (newPIN.length < 4 || newPIN.length > 8 || !/^\d+$/.test(newPIN)) {
+      setPinMessage({ text: 'O PIN deve conter entre 4 e 8 números!', error: true });
       return;
     }
     if (newPIN !== confirmNewPIN) {
@@ -150,7 +150,7 @@ export default function AdminDashboard({
     setCurrentPIN(newPIN);
     setNewPIN('');
     setConfirmNewPIN('');
-    setPinMessage({ text: 'PIN alterado com sucesso! Use o novo código de 8 dígitos no próximo acesso.', error: false });
+    setPinMessage({ text: `PIN alterado com sucesso! Use o novo código (${newPIN.length} dígitos) no próximo acesso.`, error: false });
     setTimeout(() => setPinMessage(null), 5000);
   };
 
@@ -1349,17 +1349,17 @@ export default function AdminDashboard({
                   Segurança - Alterar PIN do Gestor
                 </h3>
                 <p className="text-neutral-400 text-xs mb-4 leading-relaxed">
-                  Modifique o PIN de 8 dígitos de acesso ao painel para proteger sua loja contra acessos não autorizados. O PIN atual configurado é <span className="font-mono text-white bg-neutral-950 px-1.5 py-0.5 rounded border border-neutral-800">{currentPIN}</span>.
+                  Modifique o PIN numérico de acesso ao painel para proteger sua loja contra acessos não autorizados. Você pode definir qualquer código de 4 a 8 dígitos (ex: 1234, 1998, 20132013). O PIN atual configurado é <span className="font-mono text-white bg-neutral-950 px-1.5 py-0.5 rounded border border-neutral-800">{currentPIN}</span>.
                 </p>
 
                 <form onSubmit={handleUpdatePIN} className="space-y-4 bg-neutral-950 p-5 rounded-xl border border-neutral-800">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label className="text-xs text-neutral-400 block font-semibold">Novo PIN (8 dígitos)</label>
+                      <label className="text-xs text-neutral-400 block font-semibold">Novo PIN (4 a 8 dígitos)</label>
                       <input
                         type="password"
                         maxLength={8}
-                        placeholder="Ex: 20132013"
+                        placeholder="Ex: 1234 ou 20132013"
                         required
                         value={newPIN}
                         onChange={(e) => setNewPIN(e.target.value.replace(/\D/g, ''))}
@@ -1372,7 +1372,7 @@ export default function AdminDashboard({
                       <input
                         type="password"
                         maxLength={8}
-                        placeholder="Ex: 20132013"
+                        placeholder="Repita o novo PIN"
                         required
                         value={confirmNewPIN}
                         onChange={(e) => setConfirmNewPIN(e.target.value.replace(/\D/g, ''))}

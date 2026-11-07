@@ -280,18 +280,40 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
     }
   };
 
+  // Secret logo tap detection (5 quick clicks to open admin gate)
+  const logoTapRef = useRef<{ count: number; lastTap: number }>({ count: 0, lastTap: 0 });
+  const handleLogoSecretTap = () => {
+    const now = Date.now();
+    if (now - logoTapRef.current.lastTap > 800) {
+      logoTapRef.current.count = 1;
+    } else {
+      logoTapRef.current.count += 1;
+    }
+    logoTapRef.current.lastTap = now;
+
+    if (logoTapRef.current.count >= 5) {
+      logoTapRef.current.count = 0;
+      onEnterAdmin();
+    }
+  };
+
   return (
     <div className="min-h-screen max-w-full overflow-x-hidden bg-neutral-950 text-neutral-100 flex flex-col font-sans selection:bg-purple-500 selection:text-neutral-950">
       
       {/* Top Header */}
       <header className="sticky top-0 z-40 bg-neutral-900/95 backdrop-blur border-b border-neutral-800/80 px-4 py-3.5 shadow-lg">
         <div className="max-w-full w-full flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          {/* Logo with 5-tap secret admin trigger */}
+          <div 
+            onClick={handleLogoSecretTap}
+            className="flex items-center gap-3 cursor-pointer select-none group"
+            title={settings.storeName || 'TabasGestion'}
+          >
             {settings.logoUrl ? (
               <img
                 src={settings.logoUrl}
                 alt={settings.storeName}
-                className="h-10 w-10 rounded-xl object-cover shadow-lg border border-neutral-800 shrink-0"
+                className="h-10 w-10 rounded-xl object-cover shadow-lg border border-neutral-800 shrink-0 group-hover:border-purple-500/30 transition-colors"
               />
             ) : (
               <div className="h-10 w-10 rounded-xl bg-purple-500 flex items-center justify-center font-black text-neutral-950 text-lg tracking-wider shadow-lg shadow-purple-500/20 shrink-0">
@@ -320,17 +342,6 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
               <Crown className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
               <span className="hidden sm:inline">Grupo VIP</span>
             </a>
-
-            {/* Go to Manager Button */}
-            <button
-              onClick={onEnterAdmin}
-              className="flex items-center gap-1.5 text-xs font-semibold py-1.5 px-3 rounded-lg border border-neutral-800 bg-neutral-950 hover:bg-neutral-850 hover:border-neutral-700 transition-all text-neutral-300 hover:text-white"
-              title="Acessar Gerenciamento de Vendas"
-              id="btn-goto-manager"
-            >
-              <Lock className="w-3.5 h-3.5 text-purple-500" />
-              <span className="hidden sm:inline">Painel do Gestor</span>
-            </button>
 
             {/* Shopping Cart Trigger */}
             <button
@@ -932,10 +943,19 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
           <p>
             Desenvolvido com carinho para gerenciamento completo e checkout unificado por WhatsApp. Todas as ofertas e produtos são de responsabilidade da TabasGestion.
           </p>
-          <div className="flex justify-center gap-4 pt-2">
-            <span className="hover:text-neutral-400 cursor-help">Dúvidas? Fale conosco</span>
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-neutral-500">
+            <span className="hover:text-neutral-400">Dúvidas? Fale conosco</span>
             <span>•</span>
-            <span className="hover:text-neutral-400 cursor-help">Engenharia de Software de Alta Qualidade</span>
+            <span className="hover:text-neutral-400">Catálogo Oficial</span>
+            <span>•</span>
+            <button
+              onClick={onEnterAdmin}
+              className="text-neutral-700 hover:text-neutral-400 transition-colors text-[11px] cursor-pointer"
+              title="Acesso de Gestão"
+              id="link-footer-restricted"
+            >
+              Área Restrita
+            </button>
           </div>
         </div>
       </footer>
