@@ -145,7 +145,7 @@ export const initialProducts: Product[] = [
   {
     id: 'prod-seda-piteira-papelito-bandeja',
     code: 'SDA-002',
-    name: '1 Und Seda + Piteira PAPELITO bandeja dobrável',
+    name: '1 Und Seda + Piteira PAPELITO bandeja dobrávell',
     description: 'Combo completo de seda King Size + piteira e embalagem que se transforma em bandeja dobrável.',
     price: 10.00,
     promoPrice: 7.99,
@@ -156,7 +156,7 @@ export const initialProducts: Product[] = [
     featured: true
   },
   {
-    id: 'prod-seda-bem-bolado-slim',
+    id: 'prod-seda-bem-bolado-slim', 
     code: 'SDA-003',
     name: '1 Und Seda BEM BOLADO slim',
     description: 'Livretinho clássico Seda Bem Bolado Brasil formato slim.',
