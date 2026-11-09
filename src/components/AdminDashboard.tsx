@@ -14,6 +14,26 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Product, Category, StoreSettings, Order, OrderStatus } from '../types';
 import { validateFirestoreConnection, savePartialStoreToFirestore, getStoreDataFromFirestore } from '../firebase';
 import { compressImage } from '../utils/imageUtils';
+import {
+  getProductStockRows,
+  getProductTotalStock,
+  getStockForVariations,
+  getVariationCombinations,
+  getVariationStockKey
+} from '../utils/inventory';
+
+const parseVariationsText = (text: string): NonNullable<Product['variations']> => {
+  const parsed: NonNullable<Product['variations']> = [];
+  for (const line of text.split('\n')) {
+    const parts = line.split(':');
+    if (parts.length !== 2) continue;
+
+    const name = parts[0].trim();
+    const options = parts[1].split(',').map(option => option.trim()).filter(Boolean);
+    if (name && options.length > 0) parsed.push({ name, options });
+  }
+  return parsed;
+};
 
 interface AdminDashboardProps {
   products: Product[];
@@ -72,6 +92,8 @@ export default function AdminDashboard({
   const [prodIsActive, setProdIsActive] = useState(true);
   const [prodFeatured, setProdFeatured] = useState(false);
   const [prodVariationsText, setProdVariationsText] = useState(''); // comma separated choices for quick input: e.g. "Cor: Azul, Preto, Rosa"
+  const [prodVariationStocksEnabled, setProdVariationStocksEnabled] = useState(false);
+  const [prodVariationStocks, setProdVariationStocks] = useState<Record<string, string>>({});
   const [prodImage, setProdImage] = useState('');
   const [isUploadingProdImage, setIsUploadingProdImage] = useState(false);
 
@@ -314,11 +336,12 @@ export default function AdminDashboard({
   // Business stats calculation
   const stats = useMemo(() => {
     const totalProdCount = products.length;
-    const outOfStockCount = products.filter(p => p.stock <= 0).length;
+    const stockRows = products.flatMap(getProductStockRows);
+    const outOfStockCount = stockRows.filter(row => row.stock <= 0).length;
     
     const inventoryValuation = products.reduce((acc, p) => {
       const price = p.promoPrice ?? p.price;
-      return acc + (price * p.stock);
+      return acc + (price * getProductTotalStock(p));
     }, 0);
 
     const completedSalesTotal = orders
@@ -334,6 +357,19 @@ export default function AdminDashboard({
     };
   }, [products, orders]);
 
+  const stockAlerts = products.flatMap(product =>
+    getProductStockRows(product)
+      .filter(row => row.stock <= 2)
+      .map(row => ({
+        product,
+        stock: row.stock,
+        variationLabel: row.selectedVariations.map(variation => `${variation.name}: ${variation.value}`).join(', ')
+      }))
+  );
+
+  const formVariations = parseVariationsText(prodVariationsText);
+  const formVariationCombinations = getVariationCombinations(formVariations);
+
   // Order status management with automatic stock deduction
   const handleUpdateOrderStatus = (orderId: string, newStatus: OrderStatus) => {
     const targetOrder = orders.find(o => o.id === orderId);
@@ -342,44 +378,70 @@ export default function AdminDashboard({
     const oldStatus = targetOrder.status;
     let updatedProducts = [...products];
     let stockChanged = false;
+    const stockDelta = newStatus === 'completed' && oldStatus !== 'completed'
+      ? -1
+      : oldStatus === 'completed' && (newStatus === 'canceled' || newStatus === 'pending')
+      ? 1
+      : 0;
 
-    // Baixa automática no estoque ao marcar como "Entregue" (completed)
-    if (newStatus === 'completed' && oldStatus !== 'completed') {
-      targetOrder.items.forEach(item => {
+    if (stockDelta !== 0) {
+      for (const item of targetOrder.items) {
         const prodIndex = updatedProducts.findIndex(p => p.id === item.productId);
-        if (prodIndex !== -1) {
-          const currentStock = Number(updatedProducts[prodIndex].stock) || 0;
-          updatedProducts[prodIndex] = {
-            ...updatedProducts[prodIndex],
-            stock: Math.max(0, currentStock - item.quantity)
-          };
-          stockChanged = true;
+        if (prodIndex === -1) {
+          setSyncMessage({ text: `Não foi possível atualizar o estoque: produto "${item.productName}" não encontrado.`, error: true });
+          return;
         }
-      });
 
-      if (stockChanged) {
-        onUpdateProducts(updatedProducts);
-        setSyncMessage({ text: 'Pedido Entregue! Quantidades debitadas do estoque automaticamente.', error: false });
-        setTimeout(() => setSyncMessage(null), 4000);
+        const product = updatedProducts[prodIndex];
+        const selectedVariations = item.selectedVariations ?? [];
+        if (product.variationStocks) {
+          const variationKey = getVariationStockKey(selectedVariations);
+          if (!Object.prototype.hasOwnProperty.call(product.variationStocks, variationKey)) {
+            setSyncMessage({
+              text: `Não foi possível atualizar o estoque: a variação do produto "${item.productName}" não está cadastrada no controle de estoque.`,
+              error: true
+            });
+            return;
+          }
+        }
+
+        const currentStock = getStockForVariations(product, selectedVariations);
+        if (stockDelta < 0 && currentStock < item.quantity) {
+          setSyncMessage({
+            text: `Estoque insuficiente para concluir o pedido: "${item.productName}" (${currentStock} disponível, ${item.quantity} solicitado).`,
+            error: true
+          });
+          return;
+        }
+
+        if (product.variationStocks) {
+          const variationKey = getVariationStockKey(selectedVariations);
+          const variationStocks = {
+            ...product.variationStocks,
+            [variationKey]: currentStock + stockDelta * item.quantity
+          };
+          updatedProducts[prodIndex] = {
+            ...product,
+            variationStocks,
+            stock: Object.values(variationStocks).reduce((total, stock) => total + Math.max(0, Number(stock) || 0), 0)
+          };
+        } else {
+          updatedProducts[prodIndex] = {
+            ...product,
+            stock: currentStock + stockDelta * item.quantity
+          };
+        }
+        stockChanged = true;
       }
-    }
-    // Devolução automática ao estoque se um pedido Entregue for cancelado ou reaberto
-    else if (oldStatus === 'completed' && (newStatus === 'canceled' || newStatus === 'pending')) {
-      targetOrder.items.forEach(item => {
-        const prodIndex = updatedProducts.findIndex(p => p.id === item.productId);
-        if (prodIndex !== -1) {
-          const currentStock = Number(updatedProducts[prodIndex].stock) || 0;
-          updatedProducts[prodIndex] = {
-            ...updatedProducts[prodIndex],
-            stock: currentStock + item.quantity
-          };
-          stockChanged = true;
-        }
-      });
 
       if (stockChanged) {
         onUpdateProducts(updatedProducts);
-        setSyncMessage({ text: 'Pedido cancelado/reaberto. Quantidades estornadas ao estoque.', error: false });
+        setSyncMessage({
+          text: stockDelta < 0
+            ? 'Pedido Entregue! Estoque atualizado automaticamente.'
+            : 'Pedido cancelado/reaberto. Estoque estornado.',
+          error: false
+        });
         setTimeout(() => setSyncMessage(null), 4000);
       }
     }
@@ -413,6 +475,8 @@ export default function AdminDashboard({
     setProdIsActive(true);
     setProdFeatured(false);
     setProdVariationsText('');
+    setProdVariationStocksEnabled(false);
+    setProdVariationStocks({});
     setProdImage('');
     setIsProductModalOpen(true);
   };
@@ -425,10 +489,16 @@ export default function AdminDashboard({
     setProdPrice(String(p.price));
     setProdPromoPrice(p.promoPrice ? String(p.promoPrice) : '');
     setProdCategory(p.category);
-    setProdStock(String(p.stock));
+    setProdStock(String(getProductTotalStock(p)));
     setProdIsActive(p.isActive);
     setProdFeatured(p.featured ?? false);
     setProdImage(p.image ?? '');
+    setProdVariationStocksEnabled(Boolean(p.variationStocks));
+    setProdVariationStocks(
+      Object.fromEntries(
+        Object.entries(p.variationStocks ?? {}).map(([key, stock]) => [key, String(stock)])
+      )
+    );
     
     // Format variations text back for easy edit
     if (p.variations && p.variations.length > 0) {
@@ -454,26 +524,28 @@ export default function AdminDashboard({
       return;
     }
 
-    // Parse variations text
-    // Example: "Cor: Azul, Preto, Rosa" or "Tamanho: P, M, G"
-    const parsedVariations = [];
-    if (prodVariationsText.trim()) {
-      const lines = prodVariationsText.split('\n');
-      for (const line of lines) {
-        const parts = line.split(':');
-        if (parts.length === 2) {
-          const name = parts[0].trim();
-          const options = parts[1].split(',').map(o => o.trim()).filter(Boolean);
-          if (name && options.length > 0) {
-            parsedVariations.push({ name, options });
-          }
+    const parsedVariations = parseVariationsText(prodVariationsText);
+    const variationStocks: Record<string, number> | undefined = prodVariationStocksEnabled
+      ? {}
+      : undefined;
+    if (variationStocks) {
+      for (const combination of getVariationCombinations(parsedVariations)) {
+        const key = getVariationStockKey(combination);
+        const rawStock = prodVariationStocks[key];
+        const stock = rawStock === undefined || rawStock.trim() === '' ? NaN : Number(rawStock);
+        if (!Number.isInteger(stock) || stock < 0) {
+          alert('Informe um estoque inteiro igual ou maior que zero para cada combinação de variação.');
+          return;
         }
+        variationStocks[key] = stock;
       }
     }
 
     const priceNum = parseFloat(prodPrice);
     const promoPriceNum = prodPromoPrice.trim() ? parseFloat(prodPromoPrice) : undefined;
-    const stockNum = parseInt(prodStock) || 0;
+    const stockNum = variationStocks
+      ? Object.values(variationStocks).reduce((total, stock) => total + stock, 0)
+      : parseInt(prodStock) || 0;
 
     if (editingProduct) {
       // Edit
@@ -491,7 +563,8 @@ export default function AdminDashboard({
             stock: stockNum,
             isActive: prodIsActive,
             featured: prodFeatured,
-            variations: parsedVariations.length > 0 ? parsedVariations : undefined
+            variations: parsedVariations.length > 0 ? parsedVariations : undefined,
+            variationStocks
           };
         }
         return p;
@@ -511,7 +584,8 @@ export default function AdminDashboard({
         stock: stockNum,
         isActive: prodIsActive,
         featured: prodFeatured,
-        variations: parsedVariations.length > 0 ? parsedVariations : undefined
+        variations: parsedVariations.length > 0 ? parsedVariations : undefined,
+        variationStocks
       };
       onUpdateProducts([newProd, ...products]);
     }
@@ -745,7 +819,7 @@ export default function AdminDashboard({
                     {stats.outOfStockCount}
                   </h3>
                   <p className="text-[10px] text-neutral-500 mt-1 leading-none">
-                    Produtos aguardando reposição
+                    Produtos ou variações esgotados
                   </p>
                 </div>
 
@@ -761,15 +835,17 @@ export default function AdminDashboard({
                     Produtos com Estoque Baixo ou Crítico
                   </h3>
                   
-                  {products.filter(p => p.stock <= 2).length === 0 ? (
+                  {stockAlerts.length === 0 ? (
                     <p className="text-xs text-neutral-500 py-3 text-center">Nenhum produto com estoque crítico no momento! Parabéns. 🎉</p>
                   ) : (
                     <div className="space-y-2 max-h-[200px] overflow-y-auto">
-                      {products.filter(p => p.stock <= 2).map(p => (
-                        <div key={p.id} className="flex justify-between items-center text-xs py-1.5 border-b border-neutral-900 last:border-0">
-                          <span className="truncate pr-4 font-medium text-neutral-300">{p.name}</span>
-                          <span className={`font-bold font-mono px-2 py-0.5 rounded ${p.stock === 0 ? 'bg-red-500/10 text-red-500' : 'bg-purple-500/10 text-purple-500'}`}>
-                            {p.stock === 0 ? 'Esgotado' : `${p.stock} un`}
+                      {stockAlerts.map(({ product, stock, variationLabel }, index) => (
+                        <div key={`${product.id}-${variationLabel || 'product'}-${index}`} className="flex justify-between items-center text-xs py-1.5 border-b border-neutral-900 last:border-0">
+                          <span className="truncate pr-4 font-medium text-neutral-300">
+                            {product.name}{variationLabel ? ` - ${variationLabel}` : ''}
+                          </span>
+                          <span className={`font-bold font-mono px-2 py-0.5 rounded ${stock === 0 ? 'bg-red-500/10 text-red-500' : 'bg-purple-500/10 text-purple-500'}`}>
+                            {stock === 0 ? 'Esgotado' : `${stock} un`}
                           </span>
                         </div>
                       ))}
@@ -1041,13 +1117,18 @@ export default function AdminDashboard({
                           </td>
                           <td className="py-3.5 px-4">
                             <span className={`font-mono font-bold px-2 py-0.5 rounded ${
-                              p.stock === 0
+                              getProductTotalStock(p) === 0
                                 ? 'bg-red-500/10 text-red-500'
-                                : p.stock <= 2
+                                : getProductTotalStock(p) <= 2
                                 ? 'bg-purple-500/10 text-purple-500'
                                 : 'bg-neutral-800 text-neutral-300'
                             }`}>
-                              {p.stock} un
+                              {getProductTotalStock(p)} un
+                              {p.variationStocks && (
+                                <span className="block text-[9px] font-sans font-medium text-neutral-500">
+                                  estoque por variação
+                                </span>
+                              )}
                             </span>
                           </td>
                           <td className="py-3.5 px-4">
@@ -1748,11 +1829,22 @@ export default function AdminDashboard({
                         type="number"
                         required
                         placeholder="10"
-                        value={prodStock}
+                        value={prodVariationStocksEnabled
+                          ? formVariationCombinations.reduce((total, combination) => {
+                              const value = Number(prodVariationStocks[getVariationStockKey(combination)]);
+                              return total + (Number.isInteger(value) && value >= 0 ? value : 0);
+                            }, 0)
+                          : prodStock}
                         onChange={(e) => setProdStock(e.target.value)}
+                        disabled={prodVariationStocksEnabled}
                         className="w-full bg-neutral-950 border border-neutral-850 text-white rounded-lg py-2.5 px-3 focus:outline-none focus:border-purple-500 transition-colors"
                         id="form-product-stock"
                       />
+                      {prodVariationStocksEnabled && (
+                        <p className="text-[10px] text-neutral-500">
+                          Total calculado pela soma dos estoques das variações.
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -1808,10 +1900,50 @@ export default function AdminDashboard({
                       rows={2}
                       placeholder="Cor: Vermelho, Preto, Branco&#10;Tamanho: P, M, G"
                       value={prodVariationsText}
-                      onChange={(e) => setProdVariationsText(e.target.value)}
+                      onChange={(e) => {
+                        setProdVariationsText(e.target.value);
+                        if (!e.target.value.trim()) setProdVariationStocksEnabled(false);
+                      }}
                       className="w-full bg-neutral-950 border border-neutral-850 text-white rounded-lg py-2.5 px-3 focus:outline-none focus:border-purple-500 transition-colors resize-none font-mono"
                       id="form-product-variations"
                     />
+                    <label className="flex items-center gap-2 pt-2 text-xs text-neutral-300">
+                      <input
+                        type="checkbox"
+                        checked={prodVariationStocksEnabled}
+                        disabled={formVariationCombinations.length === 0}
+                        onChange={(e) => setProdVariationStocksEnabled(e.target.checked)}
+                        className="accent-purple-500 w-4 h-4 rounded cursor-pointer"
+                        id="form-product-variation-stock-enabled"
+                      />
+                      Controlar estoque individual por combinação
+                    </label>
+                    <p className="text-[10px] text-neutral-500 leading-normal">
+                      Ao ativar, informe a quantidade real de cada combinação. O estoque geral atual não será distribuído automaticamente.
+                    </p>
+                    {prodVariationStocksEnabled && formVariationCombinations.length > 0 && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        {formVariationCombinations.map(combination => {
+                          const key = getVariationStockKey(combination);
+                          const label = combination.map(variation => `${variation.name}: ${variation.value}`).join(' / ');
+                          return (
+                            <label key={key} className="flex items-center justify-between gap-3 rounded-lg border border-neutral-800 bg-neutral-950 p-3 text-xs">
+                              <span className="text-neutral-300">{label}</span>
+                              <input
+                                type="number"
+                                min="0"
+                                step="1"
+                                required
+                                aria-label={`Estoque de ${label}`}
+                                value={prodVariationStocks[key] ?? ''}
+                                onChange={(e) => setProdVariationStocks(prev => ({ ...prev, [key]: e.target.value }))}
+                                className="w-20 bg-neutral-900 border border-neutral-800 text-white rounded-md py-1.5 px-2 focus:outline-none focus:border-purple-500"
+                              />
+                            </label>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
 
                   <div className="border-t border-neutral-850 pt-4 flex justify-end gap-3">

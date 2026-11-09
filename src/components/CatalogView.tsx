@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, Category, CartItem, SelectedVariation, StoreSettings, Order } from '../types';
+import { getProductTotalStock, getStockForVariations, getVariationStockKey } from '../utils/inventory';
 
 interface CatalogViewProps {
   products: Product[];
@@ -19,6 +20,14 @@ interface CatalogViewProps {
   onEnterAdmin: () => void;
   onAddOrder?: (order: Order) => void;
 }
+
+const isSameStockBucket = (
+  product: Product,
+  firstSelection: SelectedVariation[],
+  secondSelection: SelectedVariation[]
+): boolean =>
+  !product.variationStocks ||
+  getVariationStockKey(firstSelection) === getVariationStockKey(secondSelection);
 
 export default function CatalogView({ products, categories, settings, onEnterAdmin, onAddOrder }: CatalogViewProps) {
   // State
@@ -70,18 +79,21 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
   // Add to cart logic
   const handleOpenProductDetail = (product: Product) => {
     setSelectedProduct(product);
+    const defaultVars = product.variations?.map(v => ({
+      name: v.name,
+      value: v.options[0]
+    })) ?? [];
     const inCart = cart
-      .filter(item => item.product.id === product.id)
+      .filter(item =>
+        item.product.id === product.id &&
+        isSameStockBucket(product, item.selectedVariations, defaultVars)
+      )
       .reduce((sum, item) => sum + item.quantity, 0);
-    const remaining = Math.max(0, product.stock - inCart);
+    const remaining = Math.max(0, getStockForVariations(product, defaultVars) - inCart);
     setCartProductQuantity(remaining > 0 ? 1 : 0);
 
     // Initialize default variations
-    if (product.variations && product.variations.length > 0) {
-      const defaultVars = product.variations.map(v => ({
-        name: v.name,
-        value: v.options[0]
-      }));
+    if (defaultVars.length > 0) {
       setSelectedProductVariations(defaultVars);
     } else {
       setSelectedProductVariations([]);
@@ -89,31 +101,44 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
   };
 
   const handleSelectVariationValue = (varName: string, value: string) => {
-    setSelectedProductVariations(prev => {
-      const existing = prev.find(item => item.name === varName);
-      if (existing) {
-        return prev.map(item => item.name === varName ? { ...item, value } : item);
-      }
-      return [...prev, { name: varName, value }];
-    });
+    const existing = selectedProductVars.find(item => item.name === varName);
+    const nextSelection = existing
+      ? selectedProductVars.map(item => item.name === varName ? { ...item, value } : item)
+      : [...selectedProductVars, { name: varName, value }];
+    setSelectedProductVariations(nextSelection);
+
+    if (selectedProduct) {
+      const alreadyInCart = cart
+        .filter(item =>
+          item.product.id === selectedProduct.id &&
+          isSameStockBucket(selectedProduct, item.selectedVariations, nextSelection)
+        )
+        .reduce((sum, item) => sum + item.quantity, 0);
+      const remaining = Math.max(0, getStockForVariations(selectedProduct, nextSelection) - alreadyInCart);
+      setCartProductQuantity(remaining > 0 ? Math.min(Math.max(1, cartProductQuantity), remaining) : 0);
+    }
   };
 
   const handleAddToCart = () => {
     if (!selectedProduct) return;
 
-    if (selectedProduct.stock <= 0) {
-      alert(`Desculpe, o produto "${selectedProduct.name}" está esgotado no momento.`);
+    const availableStock = getStockForVariations(selectedProduct, selectedProductVars);
+    if (availableStock <= 0) {
+      alert(`Desculpe, esta variação de "${selectedProduct.name}" está esgotada no momento.`);
       return;
     }
 
     const alreadyInCart = cart
-      .filter(item => item.product.id === selectedProduct.id)
+      .filter(item =>
+        item.product.id === selectedProduct.id &&
+        isSameStockBucket(selectedProduct, item.selectedVariations, selectedProductVars)
+      )
       .reduce((sum, item) => sum + item.quantity, 0);
 
-    const remainingStock = Math.max(0, selectedProduct.stock - alreadyInCart);
+    const remainingStock = Math.max(0, availableStock - alreadyInCart);
 
     if (remainingStock <= 0) {
-      alert(`Você já adicionou a quantidade máxima disponível em estoque (${selectedProduct.stock} un) deste item ao seu carrinho.`);
+      alert(`Você já adicionou a quantidade máxima disponível em estoque (${availableStock} un) desta variação ao seu carrinho.`);
       return;
     }
 
@@ -124,10 +149,7 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
       // Find identical item (same product ID AND same selected variations)
       const existingIndex = prevCart.findIndex(item => {
         if (item.product.id !== selectedProduct.id) return false;
-        if (item.selectedVariations.length !== selectedProductVars.length) return false;
-        return item.selectedVariations.every(v => 
-          selectedProductVars.find(sv => sv.name === v.name && sv.value === v.value)
-        );
+        return getVariationStockKey(item.selectedVariations) === getVariationStockKey(selectedProductVars);
       });
 
       if (existingIndex > -1) {
@@ -155,13 +177,18 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
 
       if (delta > 0) {
         const otherQtyOfSameProduct = prev
-          .filter((it, i) => i !== index && it.product.id === item.product.id)
+          .filter((it, i) =>
+            i !== index &&
+            it.product.id === item.product.id &&
+            isSameStockBucket(item.product, it.selectedVariations, item.selectedVariations)
+          )
           .reduce((sum, it) => sum + it.quantity, 0);
         
-        const availableToAdd = Math.max(0, item.product.stock - otherQtyOfSameProduct);
+        const availableStock = getStockForVariations(item.product, item.selectedVariations);
+        const availableToAdd = Math.max(0, availableStock - otherQtyOfSameProduct);
 
         if (item.quantity + delta > availableToAdd) {
-          alert(`Limite de estoque atingido! Há apenas ${item.product.stock} unidades disponíveis no momento.`);
+          alert(`Limite de estoque atingido! Há apenas ${availableStock} unidades desta variação disponíveis.`);
           return prev;
         }
       }
@@ -671,7 +698,7 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                     const hasPromo = product.promoPrice && product.promoPrice < product.price;
                     const displayPrice = hasPromo ? product.promoPrice! : product.price;
                     const discountPercent = hasPromo ? Math.round(((product.price - product.promoPrice!) / product.price) * 100) : 0;
-                    const isOutOfStock = product.stock <= 0;
+                    const isOutOfStock = getProductTotalStock(product) <= 0;
 
                     return (
                       <motion.div
@@ -783,7 +810,7 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                   {filteredProducts.map((product) => {
                     const hasPromo = product.promoPrice && product.promoPrice < product.price;
                     const displayPrice = hasPromo ? product.promoPrice! : product.price;
-                    const isOutOfStock = product.stock <= 0;
+                    const isOutOfStock = getProductTotalStock(product) <= 0;
 
                     return (
                       <motion.div
@@ -964,11 +991,16 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
       <AnimatePresence>
         {selectedProduct && (() => {
           const inCartCount = cart
-            .filter(i => i.product.id === selectedProduct.id)
+            .filter(i =>
+              i.product.id === selectedProduct.id &&
+              isSameStockBucket(selectedProduct, i.selectedVariations, selectedProductVars)
+            )
             .reduce((sum, i) => sum + i.quantity, 0);
-          const remainingStock = Math.max(0, selectedProduct.stock - inCartCount);
-          const isOutOfStock = selectedProduct.stock <= 0;
-          const isStockLimitReached = selectedProduct.stock > 0 && remainingStock <= 0;
+          const availableStock = getStockForVariations(selectedProduct, selectedProductVars);
+          const remainingStock = Math.max(0, availableStock - inCartCount);
+          const isOutOfStock = availableStock <= 0;
+          const isProductOutOfStock = getProductTotalStock(selectedProduct) <= 0;
+          const isStockLimitReached = availableStock > 0 && remainingStock <= 0;
 
           return (
             <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -1003,7 +1035,7 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                     )}
                     {isOutOfStock ? (
                       <span className="absolute top-3 left-3 bg-red-600 text-white text-xs font-black py-1 px-2.5 rounded-md shadow-md uppercase tracking-wide">
-                        PRODUTO ESGOTADO
+                        {isProductOutOfStock ? 'PRODUTO ESGOTADO' : 'VARIAÇÃO ESGOTADA'}
                       </span>
                     ) : selectedProduct.promoPrice ? (
                       <span className="absolute top-3 left-3 bg-purple-500 text-neutral-950 text-xs font-black py-1 px-2.5 rounded-md shadow-md">
@@ -1038,6 +1070,12 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                       <div className="flex flex-wrap gap-2">
                         {v.options.map((option) => {
                           const isSelected = selectedProductVars.find(sv => sv.name === v.name && sv.value === option);
+                          const optionVariations = selectedProductVars.some(sv => sv.name === v.name)
+                            ? selectedProductVars.map(sv => sv.name === v.name ? { ...sv, value: option } : sv)
+                            : [...selectedProductVars, { name: v.name, value: option }];
+                          const optionStock = selectedProduct.variationStocks
+                            ? getStockForVariations(selectedProduct, optionVariations)
+                            : undefined;
                           return (
                             <button
                               key={option}
@@ -1045,11 +1083,18 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                               className={`py-1.5 px-3.5 rounded-lg text-xs font-semibold tracking-wide border transition-all ${
                                 isSelected
                                   ? 'bg-purple-500 text-neutral-950 border-purple-500 scale-105'
+                                  : optionStock === 0
+                                  ? 'bg-neutral-950 text-red-400 border-red-900 hover:border-red-700'
                                   : 'bg-neutral-950 text-neutral-400 border-neutral-800 hover:text-white hover:border-neutral-700'
                               }`}
                               id={`btn-option-${v.name}-${option}`}
                             >
                               {option}
+                              {optionStock !== undefined && (
+                                <span className="ml-1.5 text-[9px] opacity-75">
+                                  {optionStock === 0 ? 'Esgotado' : `${optionStock} un`}
+                                </span>
+                              )}
                             </button>
                           );
                         })}
@@ -1134,14 +1179,18 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
 
                   <div className="text-[11px] text-center leading-none">
                     {isOutOfStock ? (
-                      <span className="text-red-400 font-medium">Ops! Este produto está esgotado no estoque no momento.</span>
+                      <span className="text-red-400 font-medium">
+                        {isProductOutOfStock
+                          ? 'Ops! Este produto está esgotado no estoque no momento.'
+                          : 'Esta variação está esgotada. Selecione outra opção disponível.'}
+                      </span>
                     ) : isStockLimitReached ? (
                       <span className="text-amber-400 font-medium">
-                        Você já adicionou todas as <strong className="font-mono">{selectedProduct.stock} unidades</strong> disponíveis no seu carrinho.
+                        Você já adicionou todas as <strong className="font-mono">{availableStock} unidades</strong> desta variação ao seu carrinho.
                       </span>
                     ) : (
                       <span className="text-neutral-400">
-                        Disponível em estoque: <span className="text-purple-400 font-mono font-semibold">{selectedProduct.stock} unidades</span>
+                        Estoque desta variação: <span className="text-purple-400 font-mono font-semibold">{availableStock} unidades</span>
                         {inCartCount > 0 && (
                           <span className="text-neutral-500 ml-1">({inCartCount} já no carrinho, restam {remainingStock})</span>
                         )}
@@ -1219,9 +1268,13 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                     {cart.map((item, idx) => {
                       const itemPrice = item.product.promoPrice ?? item.product.price;
                       const productInCartTotal = cart
-                        .filter(it => it.product.id === item.product.id)
+                        .filter(it =>
+                          it.product.id === item.product.id &&
+                          isSameStockBucket(item.product, it.selectedVariations, item.selectedVariations)
+                        )
                         .reduce((sum, it) => sum + it.quantity, 0);
-                      const isMaxStockReached = productInCartTotal >= item.product.stock;
+                      const itemStock = getStockForVariations(item.product, item.selectedVariations);
+                      const isMaxStockReached = productInCartTotal >= itemStock;
 
                       return (
                         <div key={idx} className="bg-neutral-950/80 border border-neutral-800 rounded-xl p-3 flex gap-3 relative">
@@ -1246,7 +1299,7 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                               </span>
                               {isMaxStockReached && (
                                 <span className="text-[10px] text-amber-400 font-mono font-medium bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
-                                  Máx: {item.product.stock} un
+                                  Máx: {itemStock} un
                                 </span>
                               )}
                             </div>
@@ -1281,7 +1334,7 @@ export default function CatalogView({ products, categories, settings, onEnterAdm
                                 isMaxStockReached ? 'text-neutral-700 cursor-not-allowed' : 'text-neutral-500 hover:text-white'
                               }`}
                               id={`btn-cart-qty-inc-${idx}`}
-                              title={isMaxStockReached ? `Estoque máximo atingido (${item.product.stock} un)` : 'Aumentar'}
+                              title={isMaxStockReached ? `Estoque máximo atingido (${itemStock} un)` : 'Aumentar'}
                             >
                               <Plus className="w-3.5 h-3.5" />
                             </button>

@@ -23,6 +23,7 @@ export interface Product {
   category: string;
   image?: string;
   variations?: ProductVariation[];
+  variationStocks?: Record<string, number>;
   stock: number;
   isActive: boolean;
   featured?: boolean;
